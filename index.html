@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PinForge — Pinterest Pin Generator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8f7f5;display:flex;height:100vh;overflow:hidden;color:#111;font-size:14px}
+.sidebar{width:230px;min-width:230px;background:#fafafa;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;height:100vh}
+.logo{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:#E60023;display:flex;align-items:center;justify-content:center}
+.logo-title{font-size:14px;font-weight:700}.logo-sub{font-size:11px;color:#9ca3af}
+.ap-banner{margin:8px 10px 0;padding:8px 10px;background:#fff0f1;border:1px solid #fecdd3;border-radius:8px;display:none}
+.ap-banner.show{display:block}
+.apl{font-size:10px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.apn{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+nav{flex:1;padding:6px 0;overflow-y:auto}
+.nb{width:100%;display:flex;align-items:center;gap:8px;padding:9px 16px;background:transparent;border:none;border-left:2px solid transparent;cursor:pointer;font-size:13px;color:#6b7280;text-align:left;transition:all .12s;font-family:inherit}
+.nb:hover{background:#fff;color:#111}.nb.active{background:#fff;border-left-color:#E60023;font-weight:500;color:#111}
+.sidebar-stats{padding:12px;border-top:1px solid #e5e7eb;background:#f9fafb;font-size:12px}
+.stat-row{display:flex;justify-content:space-between;margin-bottom:3px}
+.sv{font-weight:600;color:#E60023}
+.main{flex:1;overflow-y:auto;background:#fff}
+.tab{display:none;padding:24px;max-width:900px}.tab.active{display:block}
+h1{font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-.03em}
+.sub{font-size:13px;color:#6b7280;margin-bottom:20px}
+.btn{padding:7px 14px;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;background:#fff;color:#111;transition:all .15s}
+.btn:hover{background:#f9fafb}.btn.pr{background:#E60023;color:#fff;border-color:#E60023}.btn.pr:hover{background:#c0001e}
+.btn.pr:disabled,.btn:disabled{opacity:.5;cursor:not-allowed}.btn.sm{padding:5px 10px;font-size:12px}
+.btn.danger{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.btn.green{background:#059669;color:#fff;border-color:#059669}.btn.green:hover{background:#047857}
+input,select,textarea{width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;color:#111;background:#fff}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#E60023;box-shadow:0 0 0 3px rgba(230,0,35,.08)}
+label{font-size:12px;color:#6b7280;display:block;margin-bottom:4px}
+textarea{resize:vertical;min-height:72px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.mb{margin-bottom:12px}.mb16{margin-bottom:16px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:500;font-size:13px}
+.cb{padding:14px}
+.tag-area{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:8px;min-height:36px;cursor:text;background:#fff}
+.tag-area input{border:none;outline:none;min-width:80px;background:transparent;font-size:12px;padding:2px 4px;width:auto}
+.tag{display:inline-flex;align-items:center;gap:4px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:99px;padding:2px 8px;font-size:12px}
+.tx{cursor:pointer;color:#9ca3af;font-size:14px;line-height:1}
+.img-slot{width:76px;height:76px;border-radius:10px;border:1.5px dashed #d1d5db;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:#f9fafb;flex-shrink:0;font-size:10px;color:#9ca3af;text-align:center;gap:3px}
+.img-slot img{width:100%;height:100%;object-fit:cover}
+.prog{height:3px;background:#f3f4f6;border-radius:99px;overflow:hidden}
+.pf{height:100%;background:#E60023;border-radius:99px;transition:width .3s}
+.alert{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:12px;line-height:1.6}
+.ai{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+.aw{background:#fffbeb;border:1px solid #fde68a;color:#78350f}
+.ao{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+.ae{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+.ap{background:#faf5ff;border:1px solid #d8b4fe;color:#7e22ce}
+.csv-wrap{overflow:auto;max-height:500px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{padding:9px 12px;background:#f9fafb;border-bottom:1px solid #e5e7eb;text-align:left;font-weight:500;white-space:nowrap;position:sticky;top:0;z-index:1}
+td{padding:7px 12px;border-bottom:1px solid #f3f4f6;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td[contenteditable="true"]{cursor:text}
+td[contenteditable="true"]:focus{background:rgba(230,0,35,.04);outline:2px solid #E60023;white-space:normal;overflow:visible;max-width:none;min-width:120px}
+tr:hover td{background:#f9fafb}
+.proj-card{border:1px solid #e5e7eb;border-radius:12px;margin-bottom:8px;overflow:hidden;cursor:pointer;transition:all .15s}
+.proj-card:hover{border-color:#fca5a5}.proj-card.act{border:2px solid #E60023;background:#fff9f9}
+.pb{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.pi{width:40px;height:40px;border-radius:10px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.pinfo{flex:1;min-width:0}
+.pname{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pmeta{font-size:12px;color:#6b7280;margin-top:2px}
+.ppb{padding:0 16px 10px}.ppbar{height:4px;background:#f3f4f6;border-radius:99px;overflow:hidden}
+.ppfill{height:100%;border-radius:99px;transition:width .4s}
+.prov-pill{padding:7px 14px;border-radius:99px;font-size:13px;font-weight:500;cursor:pointer;border:2px solid #e5e7eb;background:#fff;color:#374151;transition:all .15s}
+.prov-pill.sel{border-color:#E60023;background:#fff0f1;color:#E60023}
+.acc-card{border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;overflow:hidden;transition:all .15s}
+.acc-head{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.acc-avatar{width:40px;height:40px;border-radius:50%;background:#E60023;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.acc-boards{padding:10px 16px 14px;border-top:1px solid #f3f4f6;background:#f9fafb}
+.board-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:#fff;border:1px solid #e5e7eb;border-radius:99px;font-size:12px;margin:3px;transition:all .12s}
+.board-tag:hover{border-color:#E60023}
+.board-tag .bx{cursor:pointer;color:#9ca3af;font-size:14px;line-height:1}
+.board-chip{display:inline-block;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid #e5e7eb;background:#fff;margin:3px;transition:all .12s}
+.board-chip:hover{border-color:#E60023;color:#E60023}
+.board-chip.sel{background:#E60023;color:#fff;border-color:#E60023}
+.stor-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid #e5e7eb;background:#fff;color:#374151;transition:all .15s}
+.stor-btn.sel{background:#E60023;color:#fff;border-color:#E60023}
+.img-bank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+.img-thumb{position:relative;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;aspect-ratio:1}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb .badge{position:absolute;bottom:0;left:0;right:0;padding:3px 5px;font-size:10px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+.img-thumb .rmb{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(220,38,38,.9);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border:none;line-height:1}
+.tsr{display:flex;gap:8px;align-items:center;margin-bottom:8px}.tsr input{flex:1;width:auto}
+#toast-area{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:#111;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;animation:ti .2s ease;max-width:340px;line-height:1.4}
+.toast.ok{background:#059669}.toast.err{background:#dc2626}.toast.warn{background:#d97706}
+@keyframes ti{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.empty{text-align:center;padding:48px 0;color:#9ca3af}.ei{font-size:36px;margin-bottom:10px}
+.pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:#E60023;animation:pp 1s ease-in-out infinite;margin-right:4px}
+@keyframes pp{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes proganim{0%{width:10%}60%{width:80%}100%{width:10%}}
+
+/* === EXTENSION FLOW STYLES === */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e5e7eb;position:sticky;top:0;background:#fff;z-index:1}
+.modal-body{padding:20px}
+.step-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#E60023;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.step-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.step-content{flex:1}
+.prompt-box{background:#f8f7f5;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:12px;font-family:monospace;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;padding:4px 10px;background:#fff;border:1px solid #e5e7eb;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.copy-btn:hover{background:#f9fafb}
+.provider-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.prov-open-btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #e5e7eb;background:#fff;color:#374151;display:flex;align-items:center;gap:6px;transition:all .15s}
+.prov-open-btn:hover{border-color:#E60023;color:#E60023}
+.prov-open-btn.chatgpt:hover{border-color:#10a37f;color:#10a37f}
+.prov-open-btn.gemini:hover{border-color:#4285f4;color:#4285f4}
+.result-paste{width:100%;min-height:120px;font-family:monospace;font-size:12px;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;resize:vertical}
+.result-paste:focus{outline:none;border-color:#E60023;box-shadow:0 0 0 3px rgba(230,0,35,.08)}
+.gen-status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500}
+.gen-status.pending{background:#fffbeb;color:#78350f;border:1px solid #fde68a}
+.gen-status.done{background:#f0fdf4;color:#166534;border:1px solid #86efac}
+.gen-status.error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.url-gen-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #f3f4f6}
+.url-gen-row:last-child{border-bottom:none}
+.url-chip{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#374151}
+.gen-pill{font-size:11px;padding:3px 10px;border-radius:99px;font-weight:500;flex-shrink:0}
+.gen-pill.pending{background:#f3f4f6;color:#6b7280}
+.gen-pill.generating{background:#fff0f1;color:#E60023}
+.gen-pill.done{background:#d1fae5;color:#065f46}
+.gen-pill.error{background:#fee2e2;color:#991b1b}
+.master-prompt-area{background:#f8f7f5;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;line-height:1.7}
+.mp-tag{display:inline-block;background:#fff;border:1px solid #E60023;color:#E60023;border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace}
+.batch-progress{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-top:16px}
+.bp-bar{height:6px;background:#f3f4f6;border-radius:99px;overflow:hidden;margin:8px 0}
+.bp-fill{height:100%;background:#E60023;border-radius:99px;transition:width .4s}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg></div>
+    <div><div class="logo-title">PinForge</div><div class="logo-sub">Pinterest Generator</div></div>
+  </div>
+  <div class="ap-banner" id="apb"><div class="apl">Active project</div><div class="apn" id="apn">—</div></div>
+  <nav>
+    <button class="nb active" onclick="showTab('settings',this)"><span style="font-size:15px">⚙️</span> Settings</button>
+    <button class="nb" onclick="showTab('accounts',this)"><span style="font-size:15px">👤</span> Accounts & Boards</button>
+    <button class="nb" onclick="showTab('projects',this)"><span style="font-size:15px">📁</span> Projects</button>
+    <button class="nb" onclick="showTab('urls',this)"><span style="font-size:15px">🔗</span> URLs</button>
+    <button class="nb" onclick="showTab('images',this)"><span style="font-size:15px">🖼️</span> Images</button>
+    <button class="nb" onclick="showTab('pins',this)"><span style="font-size:15px">📌</span> Pin Generator</button>
+    <button class="nb" onclick="showTab('schedule',this)"><span style="font-size:15px">🗓</span> Schedule</button>
+    <button class="nb" onclick="showTab('export',this)"><span style="font-size:15px">📥</span> Export CSV</button>
+  </nav>
+  <div class="sidebar-stats">
+    <div style="font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">This project</div>
+    <div class="stat-row"><span style="color:#6b7280">URLs</span><span class="sv" id="s-urls">0</span></div>
+    <div class="stat-row"><span style="color:#6b7280">Pins done</span><span class="sv" id="s-pins">0</span></div>
+    <div class="stat-row"><span style="color:#6b7280">Images</span><span class="sv" id="s-imgs">0</span></div>
+    <div class="stat-row"><span style="color:#6b7280">Account</span><span class="sv" id="s-acc" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px">—</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══ SETTINGS ══ -->
+<div class="tab active" id="tab-settings">
+  <h1>Settings</h1><p class="sub">Configure image hosting and your master prompt template.</p>
+
+  <!-- HOW IT WORKS -->
+  <div class="card">
+    <div class="ch">🚀 How it works — Zero API Cost</div>
+    <div class="cb">
+      <div class="alert ap" style="margin-bottom:12px">
+        <strong>No API key needed.</strong> PinForge generates a prompt for each URL, you paste it into ChatGPT, Claude, or Gemini (free or paid — your existing session), copy the result back, and PinForge extracts the pin data automatically.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:24px;height:24px;border-radius:50%;background:#E60023;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">1</span><span>Add your URLs → go to <b>Pin Generator</b></span></div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:24px;height:24px;border-radius:50%;background:#E60023;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">2</span><span>Click <b>Generate</b> → tool builds a prompt and opens ChatGPT/Claude/Gemini</span></div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:24px;height:24px;border-radius:50%;background:#E60023;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">3</span><span>Paste the AI response back → pin title, description, tags auto-populated</span></div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:24px;height:24px;border-radius:50%;background:#E60023;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">4</span><span>Add images → export Pinterest CSV</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MASTER PROMPT TEMPLATE -->
+  <div class="card">
+    <div class="ch">✍️ Master Prompt Template</div>
+    <div class="cb">
+      <div class="alert ai mb">
+        Customize how the AI writes your pin content. Use placeholders that get filled per-URL:
+        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">
+          <span class="mp-tag">{url}</span> full URL
+          <span class="mp-tag">{slug}</span> topic from URL slug
+          <span class="mp-tag">{domain}</span> website domain
+          <span class="mp-tag">{boards}</span> your Pinterest boards list
+        </div>
+      </div>
+      <div class="mb">
+        <label>Default AI Provider (opens this when you click Generate)</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+          <button class="prov-pill sel" id="dp-claude" onclick="selDefProv('claude',this)">Claude (claude.ai)</button>
+          <button class="prov-pill" id="dp-chatgpt" onclick="selDefProv('chatgpt',this)">ChatGPT (chatgpt.com)</button>
+          <button class="prov-pill" id="dp-gemini" onclick="selDefProv('gemini',this)">Gemini (gemini.google.com)</button>
+        </div>
+      </div>
+      <div class="mb">
+        <label>Master Prompt Template</label>
+        <textarea id="master-prompt" rows="14" style="font-family:monospace;font-size:12px;min-height:280px" oninput="ST.s.masterPrompt=this.value;sv()"></textarea>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn pr" onclick="saveAllSettings()">💾 Save Settings</button>
+        <button class="btn" onclick="resetMasterPrompt()">↩ Reset to Default</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE HOSTING -->
+  <div class="card">
+    <div class="ch">🖼️ ImgBB Image Hosting (Free)</div>
+    <div class="cb">
+      <div class="alert ao mb">Get free API key at <a href="https://api.imgbb.com" target="_blank">api.imgbb.com</a> — no credit card needed.</div>
+      <div style="max-width:420px" class="mb">
+        <label>ImgBB API Key</label>
+        <div style="display:flex;gap:8px">
+          <input type="password" id="ibb-key" placeholder="paste your imgbb key here" style="font-family:monospace" oninput="ST.s.imgbbKey=this.value;sv()">
+          <button class="btn sm" onclick="tvk('ibb-key',this)">Show</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn sm" onclick="testImgBB()">Test ImgBB</button>
+        <span id="ibb-msg" style="font-size:12px;color:#6b7280"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch">☁️ Cloudinary Image Hosting</div>
+    <div class="cb">
+      <div class="alert ao mb">Free at <a href="https://cloudinary.com" target="_blank">cloudinary.com</a> — Settings → Upload → Upload presets → Add preset → set to <b>Unsigned</b></div>
+      <div class="r3">
+        <div><label>Cloud Name</label><input type="text" id="cld-cloud" placeholder="your-cloud-name" oninput="ST.s.cldCloud=this.value;sv()"></div>
+        <div><label>API Key (optional)</label><input type="text" id="cld-apikey" placeholder="123456789012345" oninput="ST.s.cldApiKey=this.value;sv()"></div>
+        <div><label>Upload Preset (Unsigned)</label><input type="text" id="cld-preset" placeholder="ml_default" oninput="ST.s.cldPreset=this.value;sv()"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <button class="btn sm" onclick="testCloudinary()">Test Cloudinary</button>
+        <span id="cld-msg" style="font-size:12px;color:#6b7280"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch">🪣 Active Image Storage</div>
+    <div class="cb">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="stor-btn sel" id="st-none" onclick="selStor('none')">None (local only)</button>
+        <button class="stor-btn" id="st-cloudinary" onclick="selStor('cloudinary')">Cloudinary</button>
+        <button class="stor-btn" id="st-imgbb" onclick="selStor('imgbb')">ImgBB</button>
+      </div>
+      <div id="stor-note" style="font-size:12px;color:#6b7280"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ACCOUNTS & BOARDS ══ -->
+<div class="tab" id="tab-accounts">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+    <div>
+      <h1>Accounts & Boards</h1>
+      <p class="sub">Each account has its own board list. Available in every project.</p>
+    </div>
+    <button class="btn pr" onclick="showAddAccForm()">+ Add Account</button>
+  </div>
+  <div id="add-acc-form" style="display:none;padding:16px;background:#fff9f9;border:1px solid #fecdd3;border-radius:10px;margin-bottom:16px">
+    <div class="r2 mb">
+      <div><label>Account Name / Handle</label><input type="text" id="acc-name-inp" placeholder="e.g. @mybrand or My Fashion Store" onkeydown="if(event.key==='Enter')document.getElementById('acc-url-inp').focus()"></div>
+      <div><label>Pinterest Profile URL (optional)</label><input type="text" id="acc-url-inp" placeholder="https://pinterest.com/mybrand" onkeydown="if(event.key==='Enter')saveNewAcc()"></div>
+    </div>
+    <div class="mb">
+      <label>Board Names for this account</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" id="new-acc-board-inp" placeholder="Board name e.g. Summer Fashion, Home Decor..." style="flex:1" onkeydown="if(event.key==='Enter')addNewAccBoard()">
+        <button class="btn sm pr" onclick="addNewAccBoard()">+ Add Board</button>
+      </div>
+      <div id="new-acc-boards" style="min-height:36px;padding:6px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;display:flex;flex-wrap:wrap;gap:4px">
+        <span id="new-acc-boards-empty" style="font-size:12px;color:#9ca3af;padding:4px">No boards added yet</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn pr" onclick="saveNewAcc()">Save Account</button>
+      <button class="btn" onclick="cancelAddAcc()">Cancel</button>
+    </div>
+  </div>
+  <div id="acc-list"></div>
+  <div class="empty" id="acc-empty"><div class="ei">👤</div><p style="margin-bottom:12px">No accounts yet</p><button class="btn pr" onclick="showAddAccForm()">Add first account</button></div>
+</div>
+
+<!-- ══ PROJECTS ══ -->
+<div class="tab" id="tab-projects">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
+    <div><h1>Projects</h1><p class="sub">Each campaign is a project. Switch anytime — all data saved permanently.</p></div>
+    <button class="btn pr" onclick="showNPF()">+ New Project</button>
+  </div>
+  <div id="np-form" style="display:none;padding:14px;background:#fff9f9;border:1px solid #fecdd3;border-radius:10px;margin-bottom:16px">
+    <label style="margin-bottom:6px">Project name</label>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="np-name" placeholder="e.g. Summer Collection, August Blog Posts..." style="flex:1" onkeydown="if(event.key==='Enter')createProj()">
+      <button class="btn pr" onclick="createProj()">Create</button>
+      <button class="btn" onclick="document.getElementById('np-form').style.display='none'">Cancel</button>
+    </div>
+  </div>
+  <div class="alert aw">💡 Workflow: Create project → assign account → add URLs → generate pins → upload images → export CSV</div>
+  <div id="proj-list" style="margin-top:12px"></div>
+  <div class="empty" id="proj-empty"><div class="ei">📁</div><p style="margin-bottom:12px">No projects yet</p><button class="btn pr" onclick="showNPF()">Create first project</button></div>
+</div>
+
+<!-- ══ URLS ══ -->
+<div class="tab" id="tab-urls">
+  <h1>URLs</h1><p class="sub">Add destination URLs. The tool generates a Pinterest pin for each one.</p>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <input type="url" id="url-inp" placeholder="https://yoursite.com/blog/post-title" style="flex:1" onkeydown="if(event.key==='Enter')addUrl()">
+    <button class="btn pr" onclick="addUrl()">+ Add</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:20px">
+    <textarea id="bulk-inp" placeholder="Paste multiple URLs — one per line..." style="flex:1;min-height:80px"></textarea>
+    <button class="btn" style="align-self:flex-end" onclick="addBulkUrls()">Add All</button>
+  </div>
+  <div id="url-list"></div>
+</div>
+
+<!-- ══ IMAGES ══ -->
+<div class="tab" id="tab-images">
+  <h1>Images — Bulk Upload</h1>
+  <p class="sub">Upload all images at once. Tool auto-assigns to matching pins by filename keywords.</p>
+  <div class="alert ai mb16"><b>Auto-assign tip:</b> Name files to match your pin topic. E.g. pin about "Summer Fashion Tips" → name file <b>summer-fashion.jpg</b></div>
+  <div style="border:2px dashed #e5e7eb;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:16px" id="drop-zone"
+    onclick="document.getElementById('bulk-img-inp').click()"
+    ondragover="event.preventDefault();this.style.borderColor='#E60023'"
+    ondragleave="this.style.borderColor='#e5e7eb'"
+    ondrop="handleDrop(event)">
+    <div style="font-size:36px;margin-bottom:10px">📁</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Drop images here or click to select</div>
+    <div style="font-size:12px;color:#9ca3af">JPG, PNG, WEBP — select as many as you want</div>
+    <input type="file" id="bulk-img-inp" accept="image/*" multiple style="display:none" onchange="handleBulkImgs(this.files)">
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:13px;font-weight:500" id="img-bank-count">No images uploaded</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn sm" onclick="autoAssignAll()">✨ Auto-Assign All</button>
+      <button class="btn sm danger" onclick="clearImgBank()">Clear All</button>
+    </div>
+  </div>
+  <div id="img-bank" class="img-bank-grid"></div>
+  <div class="empty" id="img-empty"><div class="ei">🖼️</div><p>No images yet</p></div>
+  <div id="manual-section" style="display:none;margin-top:24px">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #e5e7eb">Manual assignment</div>
+    <div id="manual-list"></div>
+  </div>
+</div>
+
+<!-- ══ PINS ══ -->
+<div class="tab" id="tab-pins">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+    <div><h1>Pin Generator</h1><p class="sub">Opens ChatGPT / Claude / Gemini with your prompt — paste result back to auto-fill</p></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <button class="btn sm" onclick="copyTitles()">📋 Copy Titles</button>
+      <button class="btn sm" onclick="copyDescs()">📋 Copy Descriptions</button>
+      <button class="btn pr" id="ga-btn" onclick="genAllFlow()">✨ Generate All</button>
+    </div>
+  </div>
+  <div id="pins-cont"></div>
+  <div class="empty" id="pins-empty"><div class="ei">📌</div><p>Add URLs first, then click Generate All</p></div>
+</div>
+
+<!-- ══ SCHEDULE ══ -->
+<div class="tab" id="tab-schedule">
+  <h1>Schedule</h1>
+  <p class="sub">Enter times exactly as you want Pinterest to publish. Pinterest uses your account timezone automatically.</p>
+  <div class="alert ao mb">Just enter the time you want — Pinterest detects your location and publishes at that local time.</div>
+  <div class="r2 mb16">
+    <div><label>Start Date</label><input type="date" id="sc-date"></div>
+    <div><label>Pins Per Day</label>
+      <select id="sc-ppd">
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option selected>7</option><option>8</option>
+        <option>10</option><option>12</option><option>15</option><option>18</option><option>20</option>
+      </select>
+    </div>
+    <div><label>Gap Between Pins</label>
+      <select id="sc-int">
+        <option value="30">30 minutes</option>
+        <option value="60" selected>1 hour</option>
+        <option value="90">1.5 hours</option>
+        <option value="120">2 hours</option>
+        <option value="180">3 hours</option>
+        <option value="240">4 hours</option>
+      </select>
+    </div>
+    <div><label>Account for this schedule</label>
+      <select id="sc-acc"><option value="">— select account —</option></select>
+    </div>
+  </div>
+  <div class="mb16">
+    <div style="font-size:13px;font-weight:500;margin-bottom:8px">Publishing Windows (your local time)</div>
+    <div id="tslots">
+      <div class="tsr"><input type="time" value="08:00"><span style="color:#9ca3af;font-size:12px;flex-shrink:0">to</span><input type="time" value="11:00"><button class="btn sm danger" onclick="this.closest('.tsr').remove()">✕</button></div>
+      <div class="tsr"><input type="time" value="17:00"><span style="color:#9ca3af;font-size:12px;flex-shrink:0">to</span><input type="time" value="20:00"><button class="btn sm danger" onclick="this.closest('.tsr').remove()">✕</button></div>
+    </div>
+    <button class="btn sm" onclick="addSlot()" style="margin-top:8px">+ Add Window</button>
+  </div>
+  <button class="btn pr" onclick="genSched()">📅 Generate Schedule</button>
+  <div id="sched-prev" style="margin-top:16px"></div>
+</div>
+
+<!-- ══ EXPORT ══ -->
+<div class="tab" id="tab-export">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+    <div><h1>Export Pinterest CSV</h1><p class="sub">Click any cell to edit. Matches Pinterest official CSV format exactly.</p></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="buildExport()">🔄 Refresh</button>
+      <button class="btn pr" onclick="dlCSV()">⬇ Download CSV</button>
+    </div>
+  </div>
+  <div class="alert ao mb">✅ Exact Pinterest CSV format: Title, Description, Link, Image URL (link), Board, Keywords, Publish date, Note</div>
+  <div class="alert ai mb" style="font-size:12px">
+    <b>Pinterest CSV rules:</b><br>
+    • <b>Board</b> — must match your Pinterest board name exactly<br>
+    • <b>Image URL</b> — must be a public internet link (Cloudinary/ImgBB URL)<br>
+    • <b>Keywords</b> — space-separated words, no # symbol<br>
+    • <b>Publish date</b> — format: <code>2025-08-15 08:00:00</code> or leave blank<br>
+    <div style="margin-top:8px"><button class="btn sm" onclick="dlSampleCSV()">📄 Download Pinterest Sample CSV</button></div>
+  </div>
+  <div id="exp-cont"></div>
+  <div class="empty" id="exp-empty"><div class="ei">📄</div><p>Generate pins first, then export here</p></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ══ GENERATE MODAL ══ -->
+<div class="modal-overlay hidden" id="gen-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div style="font-size:15px;font-weight:600" id="modal-title">Generate Pin</div>
+      <button onclick="closeModal()" style="border:none;background:transparent;font-size:20px;cursor:pointer;color:#9ca3af;line-height:1">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- URL info -->
+      <div id="modal-url-info" style="font-size:12px;color:#6b7280;background:#f8f7f5;border-radius:8px;padding:8px 12px;margin-bottom:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+
+      <!-- Step 1: Open AI -->
+      <div class="step-row">
+        <span class="step-badge">1</span>
+        <div class="step-content">
+          <div style="font-weight:500;margin-bottom:8px;font-size:13px">Open your AI and paste the prompt</div>
+          <div class="provider-btns" id="modal-prov-btns">
+            <button class="prov-open-btn chatgpt" onclick="openAIProvider('chatgpt')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.8956zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>
+              ChatGPT
+            </button>
+            <button class="prov-open-btn" onclick="openAIProvider('claude')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.32 4.58C15.17 2.05 11.85.89 8.66 1.67 6.1 2.29 3.97 4.03 2.91 6.4 1.59 9.35 2.05 12.77 4.08 15.28l.41.49c.47.57 1.27.79 1.97.54l2.35-.83c.94-.33 1.44-1.36 1.12-2.3-.11-.32-.2-.65-.27-.98-.53-2.52.44-5.14 2.48-6.69.5-.38 1.04-.69 1.62-.91.71-.28 1.47-.42 2.24-.42s1.53.14 2.24.42c.58.22 1.12.53 1.62.91 2.04 1.55 3.01 4.17 2.48 6.69-.07.33-.16.66-.27.98-.32.94.18 1.97 1.12 2.3l2.35.83c.7.25 1.5.03 1.97-.54l.41-.49c2.03-2.51 2.49-5.93 1.17-8.88-.56-1.23-1.4-2.33-2.49-3.21zM7.38 16.27c-.55-.4-1.3-.35-1.8.13-.5.48-.57 1.24-.17 1.8l.18.25c.97 1.35 2.24 2.47 3.72 3.24 1.49.77 3.15 1.18 4.84 1.18 1.69 0 3.35-.41 4.84-1.18 1.48-.77 2.75-1.89 3.72-3.24l.18-.25c.4-.56.33-1.32-.17-1.8-.5-.48-1.25-.53-1.8-.13-.13.09-.24.2-.34.31-.68.94-1.55 1.72-2.56 2.29-1 .57-2.12.88-3.27.91h-.42c-1.15-.03-2.27-.34-3.27-.91-1-.57-1.87-1.35-2.56-2.29-.1-.11-.21-.22-.34-.31z"/></svg>
+              Claude
+            </button>
+            <button class="prov-open-btn gemini" onclick="openAIProvider('gemini')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm0 2.4c5.298 0 9.6 4.302 9.6 9.6S17.298 21.6 12 21.6 2.4 17.298 2.4 12 6.702 2.4 12 2.4zM8.4 8.4v7.2h2.4v-2.4H12c1.986 0 3.6-1.614 3.6-3.6S13.986 6 12 6H9.6c-.662 0-1.2.538-1.2 1.2v1.2zm2.4 0H12c.662 0 1.2.538 1.2 1.2S12.662 10.8 12 10.8h-1.2V8.4z"/></svg>
+              Gemini
+            </button>
+          </div>
+          <div style="position:relative">
+            <div class="prompt-box" id="modal-prompt-text"></div>
+            <button class="copy-btn" onclick="copyPrompt()">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Paste result -->
+      <div class="step-row" style="margin-top:20px">
+        <span class="step-badge">2</span>
+        <div class="step-content">
+          <div style="font-weight:500;margin-bottom:8px;font-size:13px">Paste the AI response here</div>
+          <textarea class="result-paste" id="modal-result" placeholder="Paste the full response from ChatGPT / Claude / Gemini here..."></textarea>
+          <div id="modal-parse-status" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn green" onclick="parseAndApply()" id="modal-apply-btn">✓ Apply to Pin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BATCH GENERATE MODAL ══ -->
+<div class="modal-overlay hidden" id="batch-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div style="font-size:15px;font-weight:600">Generate All Pins — Batch Mode</div>
+      <button onclick="closeBatchModal()" style="border:none;background:transparent;font-size:20px;cursor:pointer;color:#9ca3af;line-height:1">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert ap mb">
+        <b>Extension-style batch flow.</b> Each URL gets its own prompt. Open AI, paste prompt, get result, move to next. No API costs.
+      </div>
+
+      <div class="batch-progress" id="batch-progress">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:500" id="batch-status-text">Ready to start</span>
+          <span style="font-size:12px;color:#6b7280" id="batch-count-text">0 / 0</span>
+        </div>
+        <div class="bp-bar"><div class="bp-fill" id="batch-bar" style="width:0%"></div></div>
+      </div>
+
+      <div id="batch-url-list" style="margin-top:12px;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden"></div>
+
+      <div id="batch-current" style="display:none;margin-top:16px">
+        <div style="font-size:13px;font-weight:500;margin-bottom:10px;padding:8px 12px;background:#fff0f1;border-radius:8px;color:#E60023" id="batch-current-url"></div>
+
+        <div class="step-row">
+          <span class="step-badge">1</span>
+          <div class="step-content">
+            <div style="font-weight:500;margin-bottom:8px;font-size:13px">Open AI and paste this prompt</div>
+            <div class="provider-btns">
+              <button class="prov-open-btn chatgpt" onclick="openAIProvider('chatgpt')">ChatGPT</button>
+              <button class="prov-open-btn" onclick="openAIProvider('claude')">Claude</button>
+              <button class="prov-open-btn gemini" onclick="openAIProvider('gemini')">Gemini</button>
+            </div>
+            <div style="position:relative">
+              <div class="prompt-box" id="batch-prompt-text"></div>
+              <button class="copy-btn" onclick="copyBatchPrompt()">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row" style="margin-top:16px">
+          <span class="step-badge">2</span>
+          <div class="step-content">
+            <div style="font-weight:500;margin-bottom:8px;font-size:13px">Paste AI response here</div>
+            <textarea class="result-paste" id="batch-result" placeholder="Paste the full AI response here..."></textarea>
+            <div id="batch-parse-status" style="margin-top:6px;font-size:12px"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button class="btn" onclick="batchSkip()">Skip this URL</button>
+          <button class="btn green" onclick="batchApplyAndNext()" id="batch-next-btn">✓ Apply & Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-area"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DEFAULT MASTER PROMPT
+// ═══════════════════════════════════════════════════════════════
+const DEFAULT_MASTER_PROMPT = `You are a professional Pinterest content writer. Write content for this specific URL.
+
+URL: {url}
+Page topic (from slug): "{slug}"
+{boards_instruction}
+
+WRITE THESE 4 FIELDS:
+
+1. TITLE (40-80 characters):
+- Start with a number OR power opener: "Why", "How to", "The", "Stop", "What", "These", "This"
+- Specific to THIS topic — use the actual subject from the URL slug
+- Genuine curiosity or measurable benefit
+- BANNED: Discover, Amazing, Awesome, Check out, Click here
+
+2. DESCRIPTION (200-400 characters):
+- 3 sentences total
+- Sentence 1: One specific concrete benefit or fact about "{slug}"
+- Sentence 2: Specific detail, number, or tip with real value
+- Sentence 3: Soft action phrase (e.g. "Save for your next project" or "Try this tonight")
+- Weave 3-4 SEO keywords naturally inside sentences — do NOT list separately
+- End with 1-2 hashtags (e.g. #LowCarbRecipes #MealPrep)
+- BANNED openings: "Discover", "Are you", "Do you want", "Looking for", "Check out", "Save this pin"
+
+3. TAGS (exactly 5 keywords):
+- Real Pinterest search terms people actually type
+- Specific to "{slug}" — not generic
+- Mix: 1 broad, 2 specific, 1 audience, 1 action/result term
+- Format: comma-separated phrases, no # symbol
+
+4. BOARD: {board_instruction}
+
+Return ONLY this JSON, nothing else:
+{"title":"...","description":"...","tags":["phrase 1","phrase 2","phrase 3","phrase 4","phrase 5"],"board":"..."}`;
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const DEF_S = {
+  defProvider: 'claude',
+  masterPrompt: DEFAULT_MASTER_PROMPT,
+  storProv: 'none', cldCloud: '', cldApiKey: '', cldPreset: '',
+  imgbbKey: '', s3Bucket: '', s3Region: 'us-east-1', s3AccessKey: '', s3SecretKey: ''
+};
+
+const ST = {
+  s: Object.assign({}, DEF_S),
+  accounts: [],
+  projects: [],
+  aid: null,
+  imgBank: [],
+  _newBoards: [],
+  _currentGenUrlId: null,
+  _batchQueue: [],
+  _batchIdx: 0
+};
+
+const CSV_HDRS = ['Title','Description','Link','Image URL (link)','Board','Keywords','Publish date','Note'];
+
+const AI_URLS = {
+  chatgpt: 'https://chatgpt.com',
+  claude: 'https://claude.ai/new',
+  gemini: 'https://gemini.google.com'
+};
+
+// ─── PERSIST ─────────────────────────────────────────────────
+function sv() {
+  try {
+    localStorage.setItem('pf7', JSON.stringify({
+      s: ST.s, accounts: ST.accounts, projects: ST.projects, aid: ST.aid,
+      imgBank: ST.imgBank.map(i=>({id:i.id,name:i.name,dataUrl:i.dataUrl,hostedUrl:i.hostedUrl,assignedPinId:i.assignedPinId}))
+    }));
+  } catch(e){ console.warn('save error',e); }
+}
+function ld() {
+  try {
+    const d = JSON.parse(localStorage.getItem('pf7')||'{}');
+    if(d.s) Object.assign(ST.s, d.s);
+    if(d.accounts) ST.accounts = d.accounts;
+    if(d.projects) ST.projects = d.projects;
+    if(d.aid) ST.aid = d.aid;
+    if(d.imgBank) ST.imgBank = d.imgBank;
+  } catch{}
+}
+function ga() { return ST.projects.find(p=>p.id===ST.aid)||null; }
+function getAccById(id) { return ST.accounts.find(a=>a.id===id)||null; }
+function getActiveAcc() { const p=ga(); if(!p)return null; return getAccById(p.accountId)||null; }
+function getActiveBoardList() { const acc=getActiveAcc(); return acc?acc.boards:[]; }
+
+// ─── UTILS ───────────────────────────────────────────────────
+function toast(msg,type='ok') {
+  const d=document.createElement('div'); d.className='toast '+type; d.textContent=msg;
+  document.getElementById('toast-area').appendChild(d);
+  setTimeout(()=>d.remove(),4000);
+}
+function tvk(id,btn) { const i=document.getElementById(id); i.type=i.type==='password'?'text':'password'; btn.textContent=i.type==='password'?'Show':'Hide'; }
+function showTab(name,btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  const m={pins:renderPins,export:buildExport,projects:renderProjs,urls:renderUrls,accounts:renderAccounts,images:renderImgBank,schedule:updateSchedUI};
+  if(m[name]) m[name]();
+}
+function upStats() {
+  const p=ga(); const acc=getActiveAcc();
+  document.getElementById('s-urls').textContent=p?p.urls.length:0;
+  document.getElementById('s-pins').textContent=p?p.pins.filter(x=>x.title).length:0;
+  document.getElementById('s-imgs').textContent=p?p.pins.filter(x=>x.imageUrl).length:0;
+  document.getElementById('s-acc').textContent=acc?acc.name:'—';
+  const b=document.getElementById('apb');
+  if(p){b.classList.add('show');document.getElementById('apn').textContent=p.name;}
+  else b.classList.remove('show');
+}
+
+// ─── PROMPT BUILDER ──────────────────────────────────────────
+function buildPromptForUrl(url, existingTitle) {
+  const parts = url.split('/').filter(Boolean);
+  const slug = (parts.pop()||parts.pop()||'').replace(/[-_]/g,' ').replace(/\.\w+$/,'').trim();
+  const domain = (url.split('/')[2]||'').replace('www.','');
+  const boards = getActiveBoardList();
+
+  let boardsInstruction = '';
+  let boardInstruction = '';
+  if(boards.length) {
+    boardsInstruction = `BOARD LIST — pick the best match:\n${boards.map(b=>'- '+b).join('\n')}`;
+    boardInstruction = `Choose the best match from the board list above, or suggest one if none fit.`;
+  } else {
+    boardsInstruction = '';
+    boardInstruction = `Suggest a specific, relevant Pinterest board name.`;
+  }
+
+  const variationNote = existingTitle
+    ? `\n⚠ VARIATION MODE: Previous title was "${existingTitle}". Write a completely different angle — different hook, structure, opening word.\n`
+    : '';
+
+  let prompt = ST.s.masterPrompt || DEFAULT_MASTER_PROMPT;
+  prompt = prompt
+    .replace(/\{url\}/g, url)
+    .replace(/\{slug\}/g, slug||'this topic')
+    .replace(/\{domain\}/g, domain)
+    .replace(/\{boards_instruction\}/g, boardsInstruction)
+    .replace(/\{board_instruction\}/g, boardInstruction);
+
+  if(variationNote) prompt = variationNote + prompt;
+
+  return prompt;
+}
+
+// ─── PARSE AI RESPONSE ───────────────────────────────────────
+function parseAIResponse(text) {
+  if(!text || !text.trim()) return {error: 'Empty response'};
+  const clean = text.replace(/```json|```/gi,'').trim();
+  // Try direct parse
+  try { const d=JSON.parse(clean); return validateParsed(d); } catch{}
+  // Find JSON object
+  const match = clean.match(/\{[\s\S]*\}/);
+  if(match) { try { const d=JSON.parse(match[0]); return validateParsed(d); } catch{} }
+  return {error: 'Could not find valid JSON in response. Make sure you copied the full AI response.'};
+}
+function validateParsed(d) {
+  if(!d.title) return {error: 'Missing "title" field in JSON'};
+  if(!d.description) return {error: 'Missing "description" field in JSON'};
+  if(d.tags && d.tags.length > 5) d.tags = d.tags.slice(0,5);
+  return d;
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────
+function selDefProv(p, btn) {
+  ST.s.defProvider = p; sv();
+  document.querySelectorAll('#tab-settings .prov-pill').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function selStor(p) {
+  ST.s.storProv=p; sv();
+  ['none','cloudinary','imgbb'].forEach(s=>{const b=document.getElementById('st-'+s);if(b){b.classList.remove('sel');if(s===p)b.classList.add('sel');}});
+  const notes={none:'Images will be local preview only.',cloudinary:'Images upload to Cloudinary — permanent URLs in CSV.',imgbb:'Images upload to ImgBB — permanent URLs in CSV.'};
+  document.getElementById('stor-note').textContent=notes[p]||'';
+}
+function resetMasterPrompt() {
+  document.getElementById('master-prompt').value = DEFAULT_MASTER_PROMPT;
+  ST.s.masterPrompt = DEFAULT_MASTER_PROMPT; sv();
+  toast('Master prompt reset to default');
+}
+function saveAllSettings() {
+  ST.s.masterPrompt = document.getElementById('master-prompt').value || DEFAULT_MASTER_PROMPT;
+  ST.s.imgbbKey = document.getElementById('ibb-key').value||'';
+  ST.s.cldCloud = document.getElementById('cld-cloud').value||'';
+  ST.s.cldApiKey = document.getElementById('cld-apikey').value||'';
+  ST.s.cldPreset = document.getElementById('cld-preset').value||'';
+  sv(); toast('Settings saved!');
+}
+
+// ─── AI PROVIDER OPENER ──────────────────────────────────────
+function openAIProvider(prov) {
+  const url = AI_URLS[prov] || AI_URLS.claude;
+  window.open(url, '_blank');
+  toast('Opened '+prov+' — paste the prompt, then paste result back here', 'ok');
+}
+
+// ─── SINGLE PIN MODAL ────────────────────────────────────────
+function openGenModal(urlId) {
+  const p = ga(); if(!p) return;
+  const ue = p.urls.find(u=>u.id===urlId); if(!ue) return;
+  const pin = p.pins.find(x=>x.urlId===urlId)||{};
+
+  ST._currentGenUrlId = urlId;
+  document.getElementById('modal-title').textContent = 'Generate Pin';
+  document.getElementById('modal-url-info').textContent = ue.url;
+  document.getElementById('modal-prompt-text').textContent = buildPromptForUrl(ue.url, pin.title||'');
+  document.getElementById('modal-result').value = '';
+  document.getElementById('modal-parse-status').innerHTML = '';
+  document.getElementById('gen-modal').classList.remove('hidden');
+}
+function closeModal() { document.getElementById('gen-modal').classList.add('hidden'); }
+function copyPrompt() {
+  const txt = document.getElementById('modal-prompt-text').textContent;
+  navigator.clipboard.writeText(txt).then(()=>toast('Prompt copied!'));
+}
+function parseAndApply() {
+  const raw = document.getElementById('modal-result').value;
+  const parsed = parseAIResponse(raw);
+  const statusEl = document.getElementById('modal-parse-status');
+  if(parsed.error) {
+    statusEl.innerHTML = `<div class="gen-status error">⚠ ${parsed.error}</div>`;
+    return;
+  }
+  // Apply to pin
+  updPin(ST._currentGenUrlId, {title:parsed.title, description:parsed.description, tags:(parsed.tags||[]).slice(0,5), board:parsed.board||''});
+  statusEl.innerHTML = `<div class="gen-status done">✓ Pin data applied!</div>`;
+  sv(); upStats(); renderPins(); renderUrls();
+  setTimeout(()=>{ closeModal(); toast('Pin generated!'); }, 800);
+}
+
+// ─── BATCH GENERATE MODAL ───────────────────────────────────
+function genAllFlow() {
+  const p = ga(); if(!p||!p.urls.length){toast('Add URLs first','err');return;}
+  ST._batchQueue = p.urls.map(u=>u.id);
+  ST._batchIdx = 0;
+  renderBatchList();
+  document.getElementById('batch-modal').classList.remove('hidden');
+  advanceBatch();
+}
+function closeBatchModal() {
+  document.getElementById('batch-modal').classList.add('hidden');
+  renderPins(); upStats();
+}
+function renderBatchList() {
+  const p = ga();
+  const html = p.urls.map(u=>{
+    const pin = p.pins.find(x=>x.urlId===u.id)||{};
+    const status = pin.title ? 'done' : 'pending';
+    const label = pin.title ? 'Done' : 'Pending';
+    return `<div class="url-gen-row" id="brow-${u.id}">
+      <span class="url-chip">${u.url}</span>
+      <span class="gen-pill ${status}" id="bpill-${u.id}">${label}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('batch-url-list').innerHTML = html;
+}
+function advanceBatch() {
+  const p = ga();
+  const total = ST._batchQueue.length;
+  const done = ST._batchQueue.filter(uid=>{
+    const pin = p.pins.find(x=>x.urlId===uid);
+    return pin && pin.title;
+  }).length;
+  document.getElementById('batch-bar').style.width = (total?Math.round(done/total*100):0)+'%';
+  document.getElementById('batch-count-text').textContent = done+' / '+total;
+
+  if(ST._batchIdx >= total) {
+    document.getElementById('batch-status-text').textContent = 'All done!';
+    document.getElementById('batch-current').style.display = 'none';
+    toast('All pins generated!');
+    return;
+  }
+
+  const urlId = ST._batchQueue[ST._batchIdx];
+  const ue = p.urls.find(u=>u.id===urlId);
+  const pin = p.pins.find(x=>x.urlId===urlId)||{};
+  if(!ue) { ST._batchIdx++; advanceBatch(); return; }
+
+  // Mark current as generating
+  const pill = document.getElementById('bpill-'+urlId);
+  if(pill){ pill.textContent='Current'; pill.className='gen-pill generating'; }
+
+  document.getElementById('batch-status-text').textContent = 'Processing '+(ST._batchIdx+1)+' of '+total;
+  document.getElementById('batch-current-url').textContent = ue.url;
+  document.getElementById('batch-prompt-text').textContent = buildPromptForUrl(ue.url, pin.title||'');
+  document.getElementById('batch-result').value = '';
+  document.getElementById('batch-parse-status').textContent = '';
+  document.getElementById('batch-current').style.display = 'block';
+
+  // Scroll to top of modal body
+  document.querySelector('#batch-modal .modal-box').scrollTop = 0;
+}
+function copyBatchPrompt() {
+  const txt = document.getElementById('batch-prompt-text').textContent;
+  navigator.clipboard.writeText(txt).then(()=>toast('Prompt copied!'));
+}
+function batchApplyAndNext() {
+  const raw = document.getElementById('batch-result').value;
+  const parsed = parseAIResponse(raw);
+  const statusEl = document.getElementById('batch-parse-status');
+  if(parsed.error) {
+    statusEl.innerHTML = `<span style="color:#dc2626">⚠ ${parsed.error}</span>`;
+    return;
+  }
+  const urlId = ST._batchQueue[ST._batchIdx];
+  updPin(urlId, {title:parsed.title, description:parsed.description, tags:(parsed.tags||[]).slice(0,5), board:parsed.board||''});
+  // Mark done in list
+  const pill = document.getElementById('bpill-'+urlId);
+  if(pill){ pill.textContent='Done'; pill.className='gen-pill done'; }
+  sv(); upStats();
+  ST._batchIdx++;
+  advanceBatch();
+}
+function batchSkip() {
+  const urlId = ST._batchQueue[ST._batchIdx];
+  const pill = document.getElementById('bpill-'+urlId);
+  if(pill){ pill.textContent='Skipped'; pill.className='gen-pill pending'; }
+  ST._batchIdx++;
+  advanceBatch();
+}
+
+// ─── IMAGE UPLOAD ─────────────────────────────────────────────
+async function uploadFile(file) {
+  const sp=ST.s.storProv; if(sp==='none') return null;
+  const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
+  try {
+    let body={imageBase64:b64,fileName:file.name,mimeType:file.type};
+    if(sp==='cloudinary'){if(!ST.s.cldCloud||!ST.s.cldPreset){toast('Set Cloudinary settings first','err');return null;}Object.assign(body,{provider:'cloudinary',cloudName:ST.s.cldCloud,uploadPreset:ST.s.cldPreset});}
+    else if(sp==='imgbb'){if(!ST.s.imgbbKey){toast('Set ImgBB key first','err');return null;}Object.assign(body,{provider:'imgbb',imgbbKey:ST.s.imgbbKey});}
+    else return null;
+    const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.url) return d.url;
+    throw new Error(d.error||'Upload failed');
+  } catch(e){toast('Upload error: '+e.message,'err');return null;}
+}
+async function testCloudinary() {
+  const msg=document.getElementById('cld-msg'); msg.textContent='Testing...';msg.style.color='#6b7280';
+  if(!ST.s.cldCloud||!ST.s.cldPreset){msg.textContent='Enter Cloud Name and Upload Preset first';msg.style.color='#dc2626';return;}
+  const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  try {
+    const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:'cloudinary',cloudName:ST.s.cldCloud,uploadPreset:ST.s.cldPreset,imageBase64:b64,fileName:'test.png',mimeType:'image/png'})});
+    const d=await r.json();
+    if(d.url){msg.textContent='✓ Cloudinary works!';msg.style.color='#059669';toast('Cloudinary connected!');}
+    else throw new Error(d.error||'No URL');
+  } catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';toast('Cloudinary failed: '+e.message,'err');}
+}
+async function testImgBB() {
+  const msg=document.getElementById('ibb-msg'); msg.textContent='Testing...';msg.style.color='#6b7280';
+  if(!ST.s.imgbbKey){msg.textContent='Enter ImgBB API key first';msg.style.color='#dc2626';return;}
+  const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  try {
+    const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:'imgbb',imgbbKey:ST.s.imgbbKey,imageBase64:b64,fileName:'test.png'})});
+    const d=await r.json();
+    if(d.url){msg.textContent='✓ ImgBB works!';msg.style.color='#059669';toast('ImgBB connected!');}
+    else throw new Error(d.error||'No URL');
+  } catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';toast('ImgBB failed: '+e.message,'err');}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACCOUNTS
+// ═══════════════════════════════════════════════════════════════
+function showAddAccForm() {
+  ST._newBoards=[];
+  document.getElementById('acc-name-inp').value='';
+  document.getElementById('acc-url-inp').value='';
+  document.getElementById('new-acc-board-inp').value='';
+  renderNewAccBoards();
+  document.getElementById('add-acc-form').style.display='block';
+  document.getElementById('acc-name-inp').focus();
+}
+function cancelAddAcc() { document.getElementById('add-acc-form').style.display='none'; }
+function addNewAccBoard() {
+  const name=document.getElementById('new-acc-board-inp').value.trim(); if(!name)return;
+  if(!ST._newBoards.includes(name)) ST._newBoards.push(name);
+  document.getElementById('new-acc-board-inp').value='';
+  renderNewAccBoards();
+}
+function removeNewAccBoard(name) { ST._newBoards=ST._newBoards.filter(b=>b!==name); renderNewAccBoards(); }
+function renderNewAccBoards() {
+  const el=document.getElementById('new-acc-boards');
+  const empty=document.getElementById('new-acc-boards-empty');
+  if(!ST._newBoards.length){el.innerHTML='';el.appendChild(empty);empty.style.display='';return;}
+  empty.style.display='none';
+  el.innerHTML=ST._newBoards.map(b=>`<span class="board-tag">📌 ${b}<span class="bx" onclick="removeNewAccBoard('${b.replace(/'/g,"\\'")}')">×</span></span>`).join('');
+}
+function saveNewAcc() {
+  const name=document.getElementById('acc-name-inp').value.trim();
+  if(!name){toast('Enter an account name','err');return;}
+  const acc={id:Date.now().toString(),name,url:document.getElementById('acc-url-inp').value.trim(),boards:[...ST._newBoards],createdAt:new Date().toISOString()};
+  ST.accounts.push(acc); sv(); cancelAddAcc(); renderAccounts(); upStats();
+  toast('Account "'+name+'" saved with '+acc.boards.length+' boards');
+}
+function deleteAccount(id) {
+  const acc=getAccById(id); if(!acc)return;
+  if(!confirm('Delete account "'+acc.name+'"?'))return;
+  ST.accounts=ST.accounts.filter(a=>a.id!==id);
+  ST.projects.forEach(p=>{if(p.accountId===id)p.accountId=null;});
+  sv(); renderAccounts(); renderProjs(); upStats(); toast('Account deleted');
+}
+function addBoardToAcc(accId) {
+  const name=prompt('New board name:'); if(!name?.trim())return;
+  const acc=getAccById(accId); if(!acc)return;
+  if(!acc.boards.includes(name.trim())){acc.boards.push(name.trim());sv();renderAccounts();renderPins();toast('Board added');}
+  else toast('Board already exists','warn');
+}
+function removeBoardFromAcc(accId,boardName) {
+  const acc=getAccById(accId); if(!acc)return;
+  acc.boards=acc.boards.filter(b=>b!==boardName); sv(); renderAccounts(); renderPins();
+}
+function toggleAccBoards(id) {
+  const el=document.getElementById('acc-boards-'+id);
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+function renderAccounts() {
+  const list=document.getElementById('acc-list'),empty=document.getElementById('acc-empty');
+  if(!ST.accounts.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const usageCount={};
+  ST.projects.forEach(p=>{if(p.accountId)usageCount[p.accountId]=(usageCount[p.accountId]||0)+1;});
+  list.innerHTML=ST.accounts.map(acc=>{
+    const usage=usageCount[acc.id]||0;
+    const initials=acc.name.replace('@','').substring(0,2).toUpperCase();
+    return `<div class="acc-card">
+      <div class="acc-head">
+        <div class="acc-avatar">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600">${acc.name}</div>
+          <div style="font-size:12px;color:#6b7280">${acc.boards.length} boards${acc.url?` · <a href="${acc.url}" target="_blank" style="color:#E60023;font-size:11px">View profile</a>`:''}${usage?` · Used in ${usage} project${usage>1?'s':''}`:''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn sm" onclick="toggleAccBoards('${acc.id}')">▼ Boards (${acc.boards.length})</button>
+          <button class="btn sm pr" onclick="addBoardToAcc('${acc.id}')">+ Board</button>
+          <button class="btn sm danger" onclick="deleteAccount('${acc.id}')">Delete</button>
+        </div>
+      </div>
+      <div class="acc-boards" id="acc-boards-${acc.id}" style="display:none">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:8px">Click × to remove a board</div>
+        ${acc.boards.length?acc.boards.map(b=>`<span class="board-tag">📌 ${b}<span class="bx" onclick="removeBoardFromAcc('${acc.id}','${b.replace(/'/g,"\\'")}')">×</span></span>`).join(''):'<span style="font-size:12px;color:#9ca3af">No boards yet</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROJECTS
+// ═══════════════════════════════════════════════════════════════
+function mkProj(name) {
+  return{id:Date.now().toString(),name,status:'draft',accountId:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),urls:[],pins:[],scheduleRows:[],notes:''};
+}
+function showNPF(){const f=document.getElementById('np-form');f.style.display=f.style.display==='none'?'block':'none';if(f.style.display==='block')document.getElementById('np-name').focus();}
+function createProj(){
+  const name=document.getElementById('np-name').value.trim()||'Project '+(ST.projects.length+1);
+  const p=mkProj(name);ST.projects.push(p);ST.aid=p.id;sv();
+  document.getElementById('np-name').value='';document.getElementById('np-form').style.display='none';
+  toast('Project "'+name+'" created');renderProjs();upStats();
+}
+function assignAccToProj(projId,accId) {
+  const p=ST.projects.find(x=>x.id===projId); if(!p)return;
+  p.accountId=accId||null; sv(); renderProjs(); upStats(); renderPins();
+  const acc=getAccById(accId);
+  if(acc) toast('Assigned to: '+acc.name+' ('+acc.boards.length+' boards)');
+}
+function renderProjs(){
+  const list=document.getElementById('proj-list'),empty=document.getElementById('proj-empty');
+  if(!ST.projects.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  list.innerHTML=ST.projects.map(p=>{
+    const pins=p.pins.filter(x=>x.title).length,imgs=p.pins.filter(x=>x.imageUrl).length;
+    const pct=pins>0?Math.round(imgs/pins*100):0,isAct=p.id===ST.aid;
+    const acc=getAccById(p.accountId);
+    return`<div class="proj-card ${isAct?'act':''}" onclick="selProj('${p.id}')">
+      <div class="pb">
+        <div class="pi">${p.status==='exported'?'✅':p.status==='ready'?'🚀':p.status==='images_pending'?'🖼️':'📝'}</div>
+        <div class="pinfo">
+          <div class="pname">${p.name}${isAct?' <span style="font-size:11px;background:#E60023;color:#fff;padding:1px 8px;border-radius:99px;margin-left:8px">Active</span>':''}</div>
+          <div class="pmeta">${acc?`<span style="color:#E60023;font-weight:500">👤 ${acc.name}</span> · `:'<span style="color:#d97706">⚠ No account · </span>'}${p.urls.length} URLs · ${pins} pins · ${imgs} images</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0" onclick="event.stopPropagation()">
+          <select onchange="chgSt('${p.id}',this.value)" style="font-size:11px;padding:3px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;cursor:pointer;width:auto">
+            <option value="draft" ${p.status==='draft'?'selected':''}>Draft</option>
+            <option value="images_pending" ${p.status==='images_pending'?'selected':''}>Awaiting Images</option>
+            <option value="ready" ${p.status==='ready'?'selected':''}>Ready</option>
+            <option value="exported" ${p.status==='exported'?'selected':''}>Exported</option>
+          </select>
+          <button class="btn sm" onclick="dupeProj('${p.id}');event.stopPropagation()">⧉</button>
+          <button class="btn sm danger" onclick="delProj('${p.id}');event.stopPropagation()">✕</button>
+        </div>
+      </div>
+      <div style="padding:4px 16px 12px;border-top:1px solid #f3f4f6;display:flex;align-items:center;gap:10px">
+        <label style="font-size:12px;color:#6b7280;flex-shrink:0;margin:0">Account:</label>
+        <select style="font-size:12px;padding:4px 8px;flex:1;max-width:260px" onclick="event.stopPropagation()" onchange="assignAccToProj('${p.id}',this.value)">
+          <option value="">— assign an account —</option>
+          ${ST.accounts.map(a=>`<option value="${a.id}" ${p.accountId===a.id?'selected':''}>${a.name} (${a.boards.length} boards)</option>`).join('')}
+        </select>
+        ${acc?`<span style="font-size:11px;color:#059669">✓ ${acc.boards.length} boards available</span>`:'<span style="font-size:11px;color:#9ca3af">No boards until account assigned</span>'}
+      </div>
+      ${pins>0?`<div class="ppb"><div style="display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-bottom:3px"><span>Images ${imgs}/${pins}</span><span>${pct}%</span></div><div class="ppbar"><div class="ppfill" style="width:${pct}%;background:${pct===100?'#059669':'#E60023'}"></div></div></div>`:''}
+    </div>`;
+  }).join('');
+}
+function selProj(id){ST.aid=id;sv();renderProjs();upStats();toast('Project "'+ST.projects.find(p=>p.id===id)?.name+'" active');}
+function chgSt(id,s){const p=ST.projects.find(x=>x.id===id);if(p){p.status=s;sv();renderProjs();}}
+function dupeProj(id){
+  const src=ST.projects.find(p=>p.id===id);if(!src)return;
+  const copy={...JSON.parse(JSON.stringify(src)),id:Date.now().toString(),name:src.name+' (copy)',status:'draft',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  ST.projects.push(copy);ST.aid=copy.id;sv();renderProjs();upStats();toast('Project duplicated');
+}
+function delProj(id){
+  if(!confirm('Delete this project?'))return;
+  ST.projects=ST.projects.filter(p=>p.id!==id);
+  if(ST.aid===id)ST.aid=ST.projects[0]?.id||null;
+  sv();renderProjs();upStats();toast('Project deleted');
+}
+
+// ─── URLS ─────────────────────────────────────────────────────
+function addUrl(){
+  const inp=document.getElementById('url-inp'),url=inp.value.trim();
+  if(!url.startsWith('http')){toast('Enter a URL starting with http','err');return;}
+  const p=ga();if(!p){toast('Create a project first','err');return;}
+  if(p.urls.find(u=>u.url===url)){toast('URL already added','err');return;}
+  const e={id:Date.now()+Math.random(),url};
+  p.urls.push(e);p.pins.push({urlId:e.id,title:'',description:'',tags:[],imageUrl:'',board:'',link:url});
+  inp.value='';sv();renderUrls();upStats();toast('URL added');
+}
+function addBulkUrls(){
+  const lines=document.getElementById('bulk-inp').value.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('http'));
+  const p=ga();if(!p){toast('Create a project first','err');return;}
+  let n=0;
+  lines.forEach(url=>{
+    if(!p.urls.find(u=>u.url===url)){
+      const e={id:Date.now()+Math.random(),url};
+      p.urls.push(e);p.pins.push({urlId:e.id,title:'',description:'',tags:[],imageUrl:'',board:'',link:url});n++;
+    }
+  });
+  document.getElementById('bulk-inp').value='';sv();renderUrls();renderPins();upStats();toast(n+' URLs added');
+}
+function rmUrl(id){const p=ga();if(!p)return;p.urls=p.urls.filter(u=>u.id!==id);p.pins=p.pins.filter(x=>x.urlId!==id);sv();renderUrls();renderPins();upStats();}
+function renderUrls(){
+  const p=ga(),c=document.getElementById('url-list');
+  if(!p||!p.urls.length){c.innerHTML='<div class="empty"><div class="ei">🔗</div><p>No URLs yet</p></div>';return;}
+  c.innerHTML='<div class="card"><div>'+p.urls.map((u,i)=>{
+    const pin=p.pins.find(x=>x.urlId===u.id);
+    return`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #f3f4f6">
+      <span style="font-size:12px;color:#9ca3af;width:24px;flex-shrink:0;font-weight:600">${i+1}</span>
+      <span style="flex:1;font-size:12px;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.url}">${u.url}</span>
+      ${pin?.title?'<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:#d1fae5;color:#065f46;flex-shrink:0">✓ Pin</span>':''}
+      <button class="btn sm danger" onclick="rmUrl(${u.id})">✕</button>
+    </div>`;
+  }).join('')+'</div></div>';
+}
+
+// ─── PINS ─────────────────────────────────────────────────────
+function updPin(uid,updates){const p=ga();if(!p)return;const pin=p.pins.find(x=>x.urlId===uid);if(!pin)return;Object.assign(pin,updates);sv();}
+function rmTag(uid,tag){const p=ga();if(!p)return;const pin=p.pins.find(x=>x.urlId===uid);if(!pin)return;pin.tags=pin.tags.filter(t=>t!==tag);sv();renderPins();}
+async function quickUpload(urlId,file){
+  if(!file)return;
+  updPin(urlId,{imageUrl:URL.createObjectURL(file)});renderPins();
+  const url=await uploadFile(file);
+  if(url){updPin(urlId,{imageUrl:url});toast('Image uploaded!');renderPins();}
+  upStats();
+}
+function copyTitles(){const p=ga();const t=p?p.pins.filter(x=>x.title).map(x=>x.title):[];if(!t.length){toast('No titles yet','err');return;}navigator.clipboard.writeText(t.join('\n')).then(()=>toast(t.length+' titles copied!'));}
+function copyDescs(){const p=ga();const t=p?p.pins.filter(x=>x.description).map(x=>x.description):[];if(!t.length){toast('No descriptions yet','err');return;}navigator.clipboard.writeText(t.join('\n\n---\n\n')).then(()=>toast(t.length+' descriptions copied!'));}
+
+function renderPins(){
+  const p=ga(),c=document.getElementById('pins-cont'),empty=document.getElementById('pins-empty');
+  if(!p||!p.urls.length){c.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const boards=getActiveBoardList();
+  const acc=getActiveAcc();
+  const noAccWarn=!acc?'<div class="alert aw" style="margin-bottom:12px">⚠ No account assigned. Go to Projects tab → assign an account to see boards here.</div>':'';
+  c.innerHTML=noAccWarn+p.urls.map(u=>{
+    const pin=p.pins.find(x=>x.urlId===u.id)||{title:'',description:'',tags:[],imageUrl:'',board:''};
+    const tc=(pin.tags||[]).length;
+    const hasContent=pin.title||pin.description;
+    return`<div class="card">
+      <div class="ch" style="font-size:12px;color:#6b7280;font-weight:400">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${u.url}</span>
+        <div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px">
+          <button class="btn pr sm" onclick="openGenModal(${u.id})">✨ ${hasContent?'Regenerate':'Generate'}</button>
+        </div>
+      </div>
+      <div class="cb">
+        <div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start">
+          <div class="img-slot" onclick="document.getElementById('fi${u.id}').click()">
+            ${pin.imageUrl?`<img src="${pin.imageUrl}" alt="">`:'<div>📷</div><div>Upload</div>'}
+          </div>
+          <input type="file" id="fi${u.id}" accept="image/*" style="display:none" onchange="quickUpload(${u.id},this.files[0])">
+          <div style="flex:1">
+            <label>Title — <span style="color:${pin.title.length>90?'#dc2626':'#9ca3af'}">${pin.title.length}/100</span></label>
+            <textarea maxlength="100" rows="2" oninput="updPin(${u.id},{title:this.value})" style="min-height:52px">${pin.title}</textarea>
+          </div>
+        </div>
+        ${!hasContent?`<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:8px;padding:12px;text-align:center;margin-bottom:12px">
+          <div style="font-size:13px;color:#7e22ce;margin-bottom:8px">Click <b>Generate</b> → paste prompt into ChatGPT/Claude/Gemini → paste result back</div>
+          <button class="btn pr sm" onclick="openGenModal(${u.id})">✨ Generate this pin</button>
+        </div>`:''}
+        <div class="mb">
+          <label>SEO Description — <span style="color:${pin.description.length>480?'#dc2626':pin.description.length>0&&pin.description.length<150?'#d97706':'#059669'}">${pin.description.length}/500</span></label>
+          <textarea maxlength="500" rows="3" oninput="updPin(${u.id},{description:this.value})">${pin.description}</textarea>
+        </div>
+        <div class="mb">
+          <label>Keywords/Tags — <span style="color:${tc>=5?'#dc2626':'#9ca3af'}">max 5 (${tc}/5)</span></label>
+          <div class="tag-area" onclick="this.querySelector('input')?.focus()">
+            ${(pin.tags||[]).map(t=>`<span class="tag">${t}<span class="tx" onclick="rmTag(${u.id},'${t.replace(/'/g,"\\'")}')">×</span></span>`).join('')}
+            ${tc<5?`<input type="text" placeholder="type keyword, Enter to add..." onkeydown="if((event.key==='Enter'||event.key===',')&&this.value.trim()){event.preventDefault();const v=this.value.trim().replace(/^#/,'');const p=ga()?.pins.find(x=>x.urlId===${u.id});if(p&&!p.tags.includes(v)&&p.tags.length<5){p.tags.push(v);sv();renderPins();}this.value=''}">`:
+            '<span style="font-size:11px;color:#dc2626;padding:2px 6px">Max 5</span>'}
+          </div>
+        </div>
+        <div>
+          <label>Board — from ${acc?acc.name+"'s boards":'assigned account'}</label>
+          ${boards.length?
+            `<div style="display:flex;flex-wrap:wrap;gap:0;margin-top:4px">${boards.map(b=>`<span class="board-chip ${pin.board===b?'sel':''}" onclick="updPin(${u.id},{board:'${b.replace(/'/g,"\\'")}'}); this.closest('.cb').querySelectorAll('.board-chip').forEach(el=>el.classList.remove('sel')); this.classList.add('sel')">${b}</span>`).join('')}</div>`:
+            '<div style="font-size:12px;color:#9ca3af;padding:6px 0;border:1px dashed #e5e7eb;border-radius:8px;text-align:center;margin-top:4px">Assign an account to this project to see boards</div>'}
+          ${pin.board?`<div style="font-size:12px;color:#059669;margin-top:6px;font-weight:500">✓ Board: ${pin.board}</div>`:`<div style="font-size:12px;color:#d97706;margin-top:6px">⚠ No board selected</div>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── IMAGE BANK ───────────────────────────────────────────────
+function matchScore(fileName,pin){const name=fileName.toLowerCase().replace(/[-_.]/g,' ').replace(/\.(jpg|jpeg|png|webp|gif|avif)$/i,'');const words=name.split(' ').filter(w=>w.length>2);const target=((pin.title||'')+' '+(pin.link||'')+' '+(pin.description||'')).toLowerCase();return words.reduce((s,w)=>s+(target.includes(w)?w.length:0),0);}
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').style.borderColor='#e5e7eb';handleBulkImgs(e.dataTransfer.files);}
+async function handleBulkImgs(files){
+  const p=ga();
+  for(const file of Array.from(files)){
+    const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
+    const entry={id:Date.now()+Math.random(),name:file.name,dataUrl,hostedUrl:'',assignedPinId:null};
+    ST.imgBank.push(entry);
+    if(p) autoAssignOne(entry,p);
+    sv();renderImgBank();upStats();
+    uploadFile(file).then(url=>{if(url){entry.hostedUrl=url;if(entry.assignedPinId&&p){const pin=p.pins.find(x=>x.urlId===entry.assignedPinId);if(pin)pin.imageUrl=url;}sv();renderImgBank();upStats();}});
+  }
+  toast(Array.from(files).length+' image(s) added'+(ST.s.storProv!=='none'?', uploading...':''));
+}
+function autoAssignOne(img,proj){
+  if(!proj||!proj.pins.length)return;
+  let best=null,bestScore=0;
+  proj.pins.forEach(pin=>{const s=matchScore(img.name,pin);if(s>bestScore){bestScore=s;best=pin;}});
+  if(!best||bestScore===0) best=proj.pins.find(pin=>!ST.imgBank.find(i=>i.assignedPinId===pin.urlId&&i.id!==img.id));
+  if(best){img.assignedPinId=best.urlId;best.imageUrl=img.hostedUrl||img.dataUrl;}
+}
+function autoAssignAll(){
+  const p=ga();if(!p){toast('Select a project first','err');return;}
+  ST.imgBank.forEach(img=>{img.assignedPinId=null;});
+  [...ST.imgBank].sort((a,b)=>a.name.localeCompare(b.name)).forEach(img=>autoAssignOne(img,p));
+  ST.imgBank.forEach(img=>{if(img.assignedPinId){const pin=p.pins.find(x=>x.urlId===img.assignedPinId);if(pin)pin.imageUrl=img.hostedUrl||img.dataUrl;}});
+  sv();renderImgBank();upStats();toast('Auto-assigned '+ST.imgBank.filter(i=>i.assignedPinId).length+' images');
+}
+function assignImgToPin(imgId,pinUrlId){
+  const p=ga();const img=ST.imgBank.find(x=>x.id==imgId);if(!img||!p)return;
+  img.assignedPinId=pinUrlId?parseFloat(pinUrlId):null;
+  if(img.assignedPinId){const pin=p.pins.find(x=>x.urlId===img.assignedPinId);if(pin)pin.imageUrl=img.hostedUrl||img.dataUrl;}
+  sv();renderImgBank();upStats();
+}
+function removeImg(imgId){ST.imgBank=ST.imgBank.filter(x=>x.id!=imgId);sv();renderImgBank();}
+function clearImgBank(){if(!confirm('Clear all images?'))return;ST.imgBank=[];sv();renderImgBank();}
+function renderImgBank(){
+  const bank=document.getElementById('img-bank'),empty=document.getElementById('img-empty'),count=document.getElementById('img-bank-count'),ms=document.getElementById('manual-section'),ml=document.getElementById('manual-list');
+  const p=ga();
+  count.textContent=ST.imgBank.length?`${ST.imgBank.length} image(s) — ${ST.imgBank.filter(i=>i.hostedUrl).length} uploaded to cloud`:'No images uploaded';
+  if(!ST.imgBank.length){bank.innerHTML='';empty.style.display='block';ms.style.display='none';return;}
+  empty.style.display='none';
+  bank.innerHTML=ST.imgBank.map(img=>{
+    const pin=p?p.pins.find(x=>x.urlId===img.assignedPinId):null;
+    const label=pin?(pin.title||pin.link||'').substring(0,18):'Unassigned';
+    const bg=img.hostedUrl?'rgba(5,150,105,.85)':pin?'rgba(0,0,0,.65)':'rgba(156,163,175,.8)';
+    return`<div class="img-thumb"><img src="${img.dataUrl}" alt="${img.name}"><div class="badge" style="background:${bg}">${img.hostedUrl?'☁ ':''}${label}</div><button class="rmb" onclick="removeImg(${img.id})">✕</button></div>`;
+  }).join('');
+  if(p&&p.pins.length){
+    ms.style.display='block';
+    ml.innerHTML=ST.imgBank.map(img=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6">
+        <img src="${img.dataUrl}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.name}</div>
+          <div style="font-size:11px;color:${img.hostedUrl?'#059669':'#9ca3af'}">${img.hostedUrl?'☁ '+img.hostedUrl.substring(0,45)+'...':'Local preview only'}</div>
+        </div>
+        <select style="width:auto;font-size:12px;padding:5px 8px;max-width:230px" onchange="assignImgToPin(${img.id},this.value)">
+          <option value="">— assign to pin —</option>
+          ${p.pins.map(pin=>`<option value="${pin.urlId}" ${img.assignedPinId===pin.urlId?'selected':''}>${(pin.title||pin.link||'').substring(0,42)}</option>`).join('')}
+        </select>
+      </div>`).join('');
+  } else ms.style.display='none';
+}
+
+// ─── SCHEDULE ─────────────────────────────────────────────────
+function addSlot(){const d=document.createElement('div');d.className='tsr';d.innerHTML='<input type="time" value="09:00"><span style="color:#9ca3af;font-size:12px;flex-shrink:0">to</span><input type="time" value="12:00"><button class="btn sm danger" onclick="this.closest(\'.tsr\').remove()">✕</button>';document.getElementById('tslots').appendChild(d);}
+function updateSchedUI(){
+  const sel=document.getElementById('sc-acc');
+  sel.innerHTML='<option value="">— select account —</option>';
+  ST.accounts.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' ('+a.boards.length+' boards)';sel.appendChild(o);});
+  const p=ga();if(p&&p.accountId)sel.value=p.accountId;
+}
+function genSched(){
+  const p=ga();if(!p){toast('Select a project first','err');return;}
+  const pins=p.pins.filter(x=>x.title);if(!pins.length){toast('Generate pins first','err');return;}
+  const sd=document.getElementById('sc-date').value;if(!sd){toast('Set a start date','err');return;}
+  const ppd=parseInt(document.getElementById('sc-ppd').value);
+  const intv=parseInt(document.getElementById('sc-int').value);
+  const slots=Array.from(document.querySelectorAll('.tsr')).map(r=>{const ins=r.querySelectorAll('input[type=time]');return{from:ins[0].value,to:ins[1].value};});
+  if(!slots.length){toast('Add at least one time window','err');return;}
+  const rows=[];let pi=0,day=0;
+  while(pi<pins.length&&day<365){
+    const date=new Date(sd+'T00:00:00');date.setDate(date.getDate()+day);
+    const yyyy=date.getFullYear(),mm=String(date.getMonth()+1).padStart(2,'0'),dd=String(date.getDate()).padStart(2,'0');
+    const dateStr=date.toLocaleDateString('en-US',{month:'short',day:'numeric',weekday:'short'});
+    for(let i=0;i<ppd&&pi<pins.length;i++){
+      const sl=slots[i%slots.length];const[h,m]=sl.from.split(':').map(Number);
+      const tot=h*60+m+Math.floor((i/slots.length)*intv);
+      const fh=String(Math.floor(tot/60)%24).padStart(2,'0'),fm=String(tot%60).padStart(2,'0');
+      rows.push({date:dateStr,time:`${fh}:${fm}`,publishDate:`${yyyy}-${mm}-${dd} ${fh}:${fm}:00`,title:pins[pi].title,pinUrlId:pins[pi].urlId});
+      pi++;
+    }
+    day++;
+  }
+  p.scheduleRows=rows;sv();
+  document.getElementById('sched-prev').innerHTML=`
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">${rows.length} pins scheduled across ${day} days</div>
+    <div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden"><div class="csv-wrap"><table>
+      <thead><tr><th>#</th><th>Date</th><th>Time</th><th>Board</th><th>Title</th></tr></thead>
+      <tbody>${rows.map((r,i)=>{const pin=p.pins.find(x=>x.urlId===r.pinUrlId);return`<tr><td style="color:#9ca3af">${i+1}</td><td>${r.date}</td><td style="color:#E60023;font-weight:500">${r.time}</td><td style="color:#059669">${pin?.board||'—'}</td><td>${r.title}</td></tr>`;}).join('')}</tbody>
+    </table></div></div>`;
+  toast(rows.length+' pins scheduled');
+}
+
+// ─── EXPORT ───────────────────────────────────────────────────
+function buildExport(){
+  const p=ga(),empty=document.getElementById('exp-empty'),c=document.getElementById('exp-cont');
+  const pins=p?p.pins.filter(x=>x.title):[];
+  if(!pins.length){c.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const rows=pins.map((pin,idx)=>{
+    const sched=p.scheduleRows?.[idx];
+    return{
+      'Title':pin.title||'','Description':pin.description||'','Link':pin.link||'',
+      'Image URL (link)':pin.imageUrl||'','Board':pin.board||'',
+      'Keywords':(pin.tags||[]).slice(0,5).join(' '),
+      'Publish date':sched?sched.publishDate:'',' Note':''
+    };
+  });
+  const warns=[];
+  if(rows.filter(r=>!r['Board']).length) warns.push('⚠ '+rows.filter(r=>!r['Board']).length+' pin(s) have no board');
+  if(rows.filter(r=>!r['Image URL (link)']).length) warns.push('⚠ '+rows.filter(r=>!r['Image URL (link)']).length+' pin(s) have no image URL');
+  c.innerHTML=`
+    ${warns.length?`<div class="alert aw mb">${warns.join('<br>')}</div>`:''}
+    <div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden">
+      <div class="csv-wrap"><table>
+        <thead><tr><th style="width:28px">#</th>${CSV_HDRS.map(h=>`<th>${h}</th>`).join('')}<th style="width:28px"></th></tr></thead>
+        <tbody id="csv-tbody">${rows.map((r,i)=>`<tr>
+          <td style="color:#9ca3af;text-align:center">${i+1}</td>
+          ${CSV_HDRS.map(h=>`<td contenteditable="true">${(r[h]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>`).join('')}
+          <td><button onclick="this.closest('tr').remove()" style="border:none;background:transparent;color:#f87171;cursor:pointer;font-size:14px;padding:0 6px">✕</button></td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div style="padding:10px 14px;background:#f9fafb;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:#6b7280">${rows.length} pins · Keywords space-separated, no # · Board must match Pinterest exactly</span>
+        <button class="btn pr sm" onclick="dlCSV()">⬇ Download CSV</button>
+      </div>
+    </div>`;
+}
+function dlCSV(){
+  const tbody=document.getElementById('csv-tbody');
+  if(!tbody){toast('Click Refresh first','err');return;}
+  const rows=[CSV_HDRS.join(',')];
+  tbody.querySelectorAll('tr').forEach(tr=>{
+    const cells=Array.from(tr.querySelectorAll('td[contenteditable]'));
+    if(!cells.length)return;
+    const vals=cells.map(td=>{
+      let text=td.innerText||td.textContent||'';
+      text=text.replace(/\r?\n|\r/g,' ').replace(/\s+/g,' ').trim();
+      return '"'+text.replace(/"/g,'""')+'"';
+    });
+    rows.push(vals.join(','));
+  });
+  const content=rows.join('\n');
+  const blob=new Blob([content],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='pinterest-pins-'+new Date().toISOString().split('T')[0]+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  toast('CSV downloaded — '+(rows.length-1)+' pins');
+  const p=ga();if(p){p.status='exported';sv();}
+}
+function dlSampleCSV(){
+  const sample=[
+    'Title,Description,Link,Image URL (link),Board,Keywords,Publish date,Note',
+    '"10 Summer Fashion Ideas You Need in 2025","Discover the hottest summer fashion trends! #SummerFashion #Outfit2025","https://yoursite.com/summer-fashion","https://i.ibb.co/example.jpg","Summer Fashion","summer fashion outfit ideas 2025","2025-08-15 08:00:00",""'
+  ].join('\n');
+  const blob=new Blob([sample],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pinterest-sample-format.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+  toast('Sample CSV downloaded');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+function restoreUI(){
+  document.getElementById('master-prompt').value = ST.s.masterPrompt || DEFAULT_MASTER_PROMPT;
+  if(ST.s.imgbbKey) document.getElementById('ibb-key').value=ST.s.imgbbKey;
+  if(ST.s.cldCloud) document.getElementById('cld-cloud').value=ST.s.cldCloud;
+  if(ST.s.cldApiKey) document.getElementById('cld-apikey').value=ST.s.cldApiKey;
+  if(ST.s.cldPreset) document.getElementById('cld-preset').value=ST.s.cldPreset;
+  selStor(ST.s.storProv||'none');
+  // Restore default provider
+  const prov = ST.s.defProvider||'claude';
+  const btn = document.getElementById('dp-'+prov);
+  if(btn){ document.querySelectorAll('#tab-settings .prov-pill').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
+  document.getElementById('sc-date').value=new Date().toISOString().split('T')[0];
+}
+function init(){ld();restoreUI();upStats();renderProjs();renderAccounts();updateSchedUI();}
+init();
+</script>
+</body>
+</html>
