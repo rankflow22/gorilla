@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PinForge — Generating...</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8f7f5;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;color:#111}
+.box{background:#fff;border-radius:16px;border:1px solid #e5e7eb;padding:28px;max-width:560px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+h2{font-size:17px;font-weight:700;margin-bottom:4px}
+.url-label{font-size:11px;color:#9ca3af;margin-bottom:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:10px}
+.status-row.active{background:#fff0f1;border:1px solid #fecdd3;color:#9f1239}
+.status-row.waiting{background:#fffbeb;border:1px solid #fde68a;color:#78350f}
+.status-row.done{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+.status-row.err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+.progress-bar{height:4px;background:#f3f4f6;border-radius:99px;overflow:hidden;margin-bottom:16px}
+.progress-fill{height:100%;background:#E60023;border-radius:99px;transition:width .6s ease}
+.ai-win-info{font-size:12px;color:#6b7280;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.6}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:1px solid #e5e7eb;background:#fff;color:#111;transition:all .15s}
+.btn:hover{background:#f9fafb}
+.btn.pr{background:#E60023;color:#fff;border-color:#E60023}
+.btn.pr:hover{background:#c0001e}
+.btn.green{background:#059669;color:#fff;border-color:#059669}
+.fallback{display:none;margin-top:16px;border-top:1px solid #e5e7eb;padding-top:16px}
+.fallback textarea{width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;font-family:monospace;resize:vertical;min-height:90px;margin-bottom:8px}
+.fallback textarea:focus{outline:none;border-color:#E60023}
+.phase{font-size:11px;color:#9ca3af;margin-top:10px;text-align:center}
+.ai-btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ai-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid #e5e7eb;background:#fff;color:#374151;transition:all .15s}
+.ai-btn:hover,.ai-btn.sel{border-color:#E60023;background:#fff0f1;color:#E60023}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>⚡ PinForge Auto-Generator</h2>
+  <div class="url-label" id="url-label">Loading...</div>
+
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:5%"></div></div>
+
+  <div class="ai-btn-row" id="ai-btns">
+    <button class="ai-btn" id="btn-claude"  onclick="switchAI('claude')">Claude</button>
+    <button class="ai-btn" id="btn-chatgpt" onclick="switchAI('chatgpt')">ChatGPT</button>
+    <button class="ai-btn" id="btn-gemini"  onclick="switchAI('gemini')">Gemini</button>
+  </div>
+
+  <div class="ai-win-info" id="ai-info">Opening AI window…</div>
+
+  <div class="status-row active" id="status-row">
+    <div class="spin" id="status-spin"></div>
+    <span id="status-text">Starting…</span>
+  </div>
+
+  <div class="phase" id="phase-label"></div>
+
+  <!-- Fallback: manual paste if auto fails -->
+  <div class="fallback" id="fallback-box">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#dc2626">⚠ Auto-inject failed</div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:8px">Paste the AI response manually:</div>
+    <textarea id="manual-paste" placeholder='Paste the full AI JSON response here…'></textarea>
+    <div style="display:flex;gap:8px">
+      <button class="btn green" onclick="manualSubmit()">✓ Apply</button>
+      <button class="btn" onclick="sendSkip()">Skip</button>
+    </div>
+    <div id="manual-err" style="font-size:12px;color:#dc2626;margin-top:6px"></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;margin-top:16px">
+    <button class="btn" onclick="sendSkip()">Skip this URL</button>
+    <button class="btn pr" id="retry-btn" onclick="retryInject()" style="display:none">↺ Retry Inject</button>
+  </div>
+</div>
+
+<script>
+// ─── PARAMS ──────────────────────────────────────────────────
+const params  = new URLSearchParams(location.search);
+const PROMPT  = decodeURIComponent(params.get('prompt') || '');
+const URL_VAL = decodeURIComponent(params.get('url')    || '');
+const CHANNEL = params.get('ch') || 'pinforge';
+const URL_ID  = params.get('id') || '';
+let   PROVIDER = params.get('provider') || 'claude';
+
+document.getElementById('url-label').textContent = URL_VAL;
+document.getElementById('btn-' + PROVIDER)?.classList.add('sel');
+
+// ─── AI CONFIG ───────────────────────────────────────────────
+const AI_CFG = {
+  claude: {
+    url: 'https://claude.ai/new',
+    name: 'Claude',
+    // Input selectors — tried in order
+    inputSelectors: [
+      'div[contenteditable="true"][data-placeholder]',
+      'div[contenteditable="true"].ProseMirror',
+      'div[contenteditable="true"]',
+      'textarea[placeholder]',
+      'textarea',
+    ],
+    // Send button selectors
+    sendSelectors: [
+      'button[aria-label="Send message"]',
+      'button[data-testid="send-button"]',
+      'button[aria-label*="Send"]',
+      'button[type="submit"]',
+    ],
+    // Response container selectors
+    responseSelectors: [
+      '.font-claude-message',
+      '[data-testid="assistant-message"]',
+      '.prose',
+      '.message-content',
+      '[class*="assistant"]',
+    ],
+    // How to detect response is done (no streaming indicator)
+    doneIndicators: [
+      'button[aria-label="Stop"]',         // if PRESENT = still streaming
+      '.loading-indicator',
+      '[data-testid="stop-button"]',
+    ],
+    waitForDoneMs: 3000,
+  },
+  chatgpt: {
+    url: 'https://chatgpt.com',
+    name: 'ChatGPT',
+    inputSelectors: [
+      '#prompt-textarea',
+      'div[contenteditable="true"][id="prompt-textarea"]',
+      'div[contenteditable="true"]',
+      'textarea[placeholder]',
+      'textarea',
+    ],
+    sendSelectors: [
+      'button[data-testid="send-button"]',
+      'button[aria-label="Send prompt"]',
+      'button[aria-label*="Send"]',
+      'button[type="submit"]',
+    ],
+    responseSelectors: [
+      '[data-message-author-role="assistant"] .markdown',
+      '[data-message-author-role="assistant"]',
+      '.markdown.prose',
+      '[class*="assistant"]',
+    ],
+    doneIndicators: [
+      'button[aria-label="Stop streaming"]',
+      'button[data-testid="stop-button"]',
+      '[aria-label*="Stop"]',
+    ],
+    waitForDoneMs: 3000,
+  },
+  gemini: {
+    url: 'https://gemini.google.com',
+    name: 'Gemini',
+    inputSelectors: [
+      'rich-textarea div[contenteditable="true"]',
+      'div[contenteditable="true"][aria-label*="message"]',
+      'div[contenteditable="true"]',
+      'textarea',
+    ],
+    sendSelectors: [
+      'button[aria-label="Send message"]',
+      'button.send-button',
+      'button[type="submit"]',
+      'mat-icon[fonticon="send"]',
+    ],
+    responseSelectors: [
+      'model-response .markdown',
+      'model-response',
+      '[class*="response-container"]',
+      '.response-content',
+    ],
+    doneIndicators: [
+      'button[aria-label="Stop response"]',
+      '.loading-indicator',
+      'mat-spinner',
+    ],
+    waitForDoneMs: 4000,
+  },
+};
+
+// ─── STATE ───────────────────────────────────────────────────
+let aiWin = null;
+let phase = 'opening';   // opening → injecting → waiting → extracting → done
+let pollTimer = null;
+let injectAttempts = 0;
+let extractAttempts = 0;
+let lastResponseText = '';
+let streamSettleTimer = null;
+
+// ─── UI HELPERS ──────────────────────────────────────────────
+function setStatus(text, type='active') {
+  const row = document.getElementById('status-row');
+  const spin = document.getElementById('status-spin');
+  const txt  = document.getElementById('status-text');
+  row.className = 'status-row ' + type;
+  spin.style.display = (type === 'active' || type === 'waiting') ? '' : 'none';
+  txt.textContent = text;
+}
+function setPhase(label, pct) {
+  document.getElementById('phase-label').textContent = label;
+  document.getElementById('prog').style.width = pct + '%';
+}
+function setInfo(html) {
+  document.getElementById('ai-info').innerHTML = html;
+}
+function showFallback() {
+  document.getElementById('fallback-box').style.display = 'block';
+  document.getElementById('retry-btn').style.display = '';
+}
+
+// ─── BROADCAST ───────────────────────────────────────────────
+function sendResult(data) {
+  const bc = new BroadcastChannel(CHANNEL);
+  bc.postMessage({ type: 'pin_result', urlId: URL_ID, data });
+  bc.close();
+  setStatus('✓ Done! Sending result…', 'done');
+  setPhase('Complete', 100);
+  setTimeout(() => window.close(), 1200);
+}
+function sendSkip() {
+  clearTimers();
+  if(aiWin && !aiWin.closed) aiWin.close();
+  const bc = new BroadcastChannel(CHANNEL);
+  bc.postMessage({ type: 'pin_skip', urlId: URL_ID });
+  bc.close();
+  window.close();
+}
+
+// ─── PARSE ───────────────────────────────────────────────────
+function parseAI(text) {
+  if (!text?.trim()) return null;
+  const clean = text.replace(/```json|```/gi, '').trim();
+  try { return validate(JSON.parse(clean)); } catch {}
+  // Find last JSON object in text (AI may ramble before JSON)
+  const all = [...clean.matchAll(/\{[\s\S]*?\}/g)];
+  for (let i = all.length - 1; i >= 0; i--) {
+    try { const d = validate(JSON.parse(all[i][0])); if(d && !d.error) return d; } catch {}
+  }
+  // Wide match
+  const m = clean.match(/\{[\s\S]*\}/);
+  if (m) { try { return validate(JSON.parse(m[0])); } catch {} }
+  return null;
+}
+function validate(d) {
+  if (!d || typeof d !== 'object') return null;
+  if (!d.title || !d.description) return null;
+  if (d.tags?.length > 5) d.tags = d.tags.slice(0, 5);
+  return d;
+}
+
+// ─── INJECT INTO AI WINDOW ───────────────────────────────────
+function clearTimers() {
+  clearTimeout(pollTimer);
+  clearTimeout(streamSettleTimer);
+}
+
+function switchAI(provider) {
+  PROVIDER = provider;
+  document.querySelectorAll('.ai-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('btn-' + provider)?.classList.add('sel');
+  clearTimers();
+  if (aiWin && !aiWin.closed) aiWin.close();
+  injectAttempts = 0;
+  extractAttempts = 0;
+  startFlow();
+}
+
+function retryInject() {
+  document.getElementById('fallback-box').style.display = 'none';
+  document.getElementById('retry-btn').style.display = 'none';
+  injectAttempts = 0;
+  extractAttempts = 0;
+  clearTimers();
+  if (aiWin && !aiWin.closed) aiWin.close();
+  startFlow();
+}
+
+function startFlow() {
+  const cfg = AI_CFG[PROVIDER];
+  phase = 'opening';
+  setStatus('Opening ' + cfg.name + '…', 'active');
+  setPhase('Opening AI', 10);
+  setInfo(`<b>${cfg.name}</b> is opening in a new window. Do not close it — PinForge will inject the prompt automatically.`);
+
+  // Open AI window sized like a real browser
+  const w=1100, h=780;
+  const left = Math.round(window.screenX + window.outerWidth + 10);
+  const top  = Math.round(window.screenY);
+  aiWin = window.open(cfg.url, 'pf_ai_win',
+    `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+
+  if (!aiWin) {
+    setStatus('Popup blocked — allow popups for this site!', 'err');
+    setInfo('Go to your browser address bar → allow popups → click Retry.');
+    showFallback();
+    return;
+  }
+
+  // Wait for AI page to load, then inject
+  phase = 'injecting';
+  setPhase('Waiting for AI to load', 20);
+  pollTimer = setTimeout(() => tryInject(), 3500);
+}
+
+function tryInject() {
+  const cfg = AI_CFG[PROVIDER];
+  injectAttempts++;
+
+  if (!aiWin || aiWin.closed) {
+    setStatus('AI window was closed. Use fallback below or retry.', 'err');
+    showFallback();
+    return;
+  }
+
+  // Try to access the window DOM
+  let doc;
+  try {
+    doc = aiWin.document;
+    if (!doc || !doc.body || doc.body.innerHTML.length < 100) throw new Error('not loaded');
+  } catch(e) {
+    // Cross-origin or not loaded yet
+    if (injectAttempts < 20) {
+      setStatus('Waiting for ' + cfg.name + ' to load… (' + injectAttempts + ')', 'active');
+      setPhase('Loading AI page', Math.min(10 + injectAttempts * 3, 35));
+      pollTimer = setTimeout(() => tryInject(), 1500);
+    } else {
+      // Cross-origin block — use clipboard injection method
+      setStatus(cfg.name + ' loaded. Using clipboard injection…', 'waiting');
+      clipboardInjectFlow();
+    }
+    return;
+  }
+
+  // Same-origin success — inject directly into DOM
+  const inputEl = findElement(doc, cfg.inputSelectors);
+  if (!inputEl) {
+    if (injectAttempts < 15) {
+      setStatus('Waiting for chat input to appear… (' + injectAttempts + ')', 'active');
+      setPhase('Finding input field', Math.min(20 + injectAttempts * 2, 40));
+      pollTimer = setTimeout(() => tryInject(), 1500);
+    } else {
+      setStatus('Input not found — using clipboard method…', 'waiting');
+      clipboardInjectFlow();
+    }
+    return;
+  }
+
+  // Found input — inject the prompt
+  injectText(doc, inputEl, cfg);
+}
+
+function findElement(doc, selectors) {
+  for (const sel of selectors) {
+    try {
+      const el = doc.querySelector(sel);
+      if (el) return el;
+    } catch {}
+  }
+  return null;
+}
+
+function injectText(doc, inputEl, cfg) {
+  try {
+    setStatus('Injecting prompt into ' + cfg.name + '…', 'active');
+    setPhase('Injecting prompt', 45);
+    setInfo(`Prompt injected into <b>${cfg.name}</b>. Waiting for AI to send and respond…`);
+
+    // Focus the input
+    inputEl.focus();
+    aiWin.focus();
+
+    // Set text via different methods depending on element type
+    if (inputEl.tagName === 'TEXTAREA') {
+      // Standard textarea
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(aiWin.HTMLTextAreaElement.prototype, 'value')?.set;
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(inputEl, PROMPT);
+      } else {
+        inputEl.value = PROMPT;
+      }
+      inputEl.dispatchEvent(new aiWin.Event('input', { bubbles: true }));
+      inputEl.dispatchEvent(new aiWin.Event('change', { bubbles: true }));
+    } else {
+      // contenteditable div
+      inputEl.innerHTML = '';
+      // Use execCommand for contenteditable (works even in iframes)
+      inputEl.focus();
+      doc.execCommand('selectAll', false, null);
+      doc.execCommand('insertText', false, PROMPT);
+      // Also try direct innerText + events as fallback
+      if (!inputEl.textContent || inputEl.textContent.length < 10) {
+        inputEl.textContent = PROMPT;
+        inputEl.dispatchEvent(new aiWin.InputEvent('input', { bubbles: true, inputType: 'insertText', data: PROMPT }));
+      }
+    }
+
+    // Trigger React/Vue synthetic events
+    ['input', 'keyup', 'change'].forEach(evType => {
+      inputEl.dispatchEvent(new aiWin.Event(evType, { bubbles: true }));
+    });
+
+    // Wait a moment, then find and click Send
+    pollTimer = setTimeout(() => clickSend(doc, cfg), 800);
+
+  } catch(e) {
+    // Cross-origin error mid-inject — fallback
+    setStatus('Direct inject blocked — using clipboard method…', 'waiting');
+    clipboardInjectFlow();
+  }
+}
+
+function clickSend(doc, cfg) {
+  try {
+    const sendBtn = findElement(doc, cfg.sendSelectors);
+    if (sendBtn && !sendBtn.disabled) {
+      sendBtn.click();
+      setStatus('Prompt sent! Waiting for ' + cfg.name + ' to respond…', 'waiting');
+      setPhase('AI is responding', 55);
+      setInfo(`<b>${cfg.name}</b> is generating the response. This window will capture it automatically.`);
+      phase = 'waiting';
+      extractAttempts = 0;
+      pollTimer = setTimeout(() => tryExtract(doc, cfg), 4000);
+    } else if (!sendBtn) {
+      // Try Enter key
+      const inputEl = findElement(doc, cfg.inputSelectors);
+      if (inputEl) {
+        inputEl.dispatchEvent(new aiWin.KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+        setStatus('Sent via Enter key! Waiting for response…', 'waiting');
+        setPhase('AI is responding', 55);
+        phase = 'waiting';
+        extractAttempts = 0;
+        pollTimer = setTimeout(() => tryExtract(doc, cfg), 4000);
+      } else {
+        setStatus('Send button not found — please send manually in the AI window', 'waiting');
+        setPhase('Manual send needed', 50);
+        setInfo(`Prompt is typed in <b>${cfg.name}</b>. Please press Enter or click Send there, then wait. This window will capture the response automatically.`);
+        phase = 'waiting';
+        pollTimer = setTimeout(() => tryExtract(doc, cfg), 3000);
+      }
+    } else if (sendBtn.disabled) {
+      // Button exists but disabled — prompt may not have been set properly
+      pollTimer = setTimeout(() => clickSend(doc, cfg), 500);
+    }
+  } catch(e) {
+    clipboardInjectFlow();
+  }
+}
+
+function tryExtract(doc, cfg) {
+  try {
+    if (!aiWin || aiWin.closed) {
+      setStatus('AI window closed before response captured.', 'err');
+      showFallback();
+      return;
+    }
+
+    extractAttempts++;
+    setPhase('Reading response', Math.min(55 + extractAttempts * 2, 85));
+
+    // Check if still streaming
+    const stillStreaming = cfg.doneIndicators.some(sel => {
+      try { return !!doc.querySelector(sel); } catch { return false; }
+    });
+
+    // Get all response elements
+    let responseText = '';
+    for (const sel of cfg.responseSelectors) {
+      try {
+        const els = doc.querySelectorAll(sel);
+        if (els.length > 0) {
+          // Take the LAST assistant message
+          const last = els[els.length - 1];
+          const text = last.innerText || last.textContent || '';
+          if (text.length > responseText.length) responseText = text;
+        }
+      } catch {}
+    }
+
+    if (responseText.length > 20) {
+      if (responseText !== lastResponseText) {
+        // Response is growing (still streaming)
+        lastResponseText = responseText;
+        if (stillStreaming || extractAttempts < 8) {
+          setStatus('Response streaming… (' + responseText.length + ' chars)', 'active');
+          pollTimer = setTimeout(() => tryExtract(doc, cfg), 2000);
+          return;
+        }
+      }
+
+      // Response settled — try to parse
+      clearTimeout(streamSettleTimer);
+      if (stillStreaming && extractAttempts < 20) {
+        setStatus('Waiting for response to finish…', 'waiting');
+        pollTimer = setTimeout(() => tryExtract(doc, cfg), 2000);
+        return;
+      }
+
+      // Parse
+      const parsed = parseAI(responseText);
+      if (parsed) {
+        if (aiWin && !aiWin.closed) aiWin.close();
+        sendResult(parsed);
+        return;
+      } else {
+        // Got text but no valid JSON yet — may still be streaming
+        if (extractAttempts < 25) {
+          setStatus('Waiting for JSON in response…', 'waiting');
+          pollTimer = setTimeout(() => tryExtract(doc, cfg), 2000);
+          return;
+        }
+        // Give up auto — show manual with pre-filled text
+        setStatus('Could not find JSON in response — paste below', 'err');
+        document.getElementById('manual-paste').value = responseText;
+        showFallback();
+        return;
+      }
+    }
+
+    // No response yet
+    if (extractAttempts < 30) {
+      setStatus('Waiting for response… (' + extractAttempts + ')', 'waiting');
+      pollTimer = setTimeout(() => tryExtract(doc, cfg), 2000);
+    } else {
+      setStatus('Timeout — AI window may be blocked or slow', 'err');
+      setInfo('The AI window is open but no response was captured. You can paste manually below.');
+      showFallback();
+    }
+  } catch(e) {
+    // Cross-origin — switch to postMessage polling
+    postMessageExtractFlow(cfg);
+  }
+}
+
+// ─── CLIPBOARD INJECTION (cross-origin fallback) ──────────────
+// When AI site blocks direct DOM access, we:
+// 1. Copy prompt to clipboard
+// 2. Use keyboard events via window.focus to paste
+// 3. Poll via postMessage for response
+function clipboardInjectFlow() {
+  const cfg = AI_CFG[PROVIDER];
+  setStatus('Copying prompt to clipboard…', 'active');
+  setPhase('Clipboard injection', 40);
+
+  navigator.clipboard.writeText(PROMPT).then(() => {
+    setStatus('Prompt copied! Focusing AI window to paste automatically…', 'active');
+    setPhase('Auto-pasting', 45);
+
+    if (!aiWin || aiWin.closed) { showFallback(); return; }
+
+    // Focus AI window
+    aiWin.focus();
+
+    // Give it a moment, then simulate Ctrl+A, Ctrl+V
+    setTimeout(() => {
+      try {
+        // Send Ctrl+V to the AI window to paste
+        aiWin.dispatchEvent(new KeyboardEvent('keydown', { key: 'v', ctrlKey: true, metaKey: true, bubbles: true }));
+        // Also try postMessage
+        aiWin.postMessage({ type: 'pinforge_inject', prompt: PROMPT }, '*');
+      } catch {}
+
+      setStatus('Prompt pasted into ' + cfg.name + '. Please press Enter to send, then wait.', 'waiting');
+      setPhase('Waiting for response', 50);
+      setInfo(`✅ Prompt copied to clipboard and pasted into <b>${cfg.name}</b>.<br>
+        <b>→ Press Enter in the AI window to send.</b><br>
+        This window will try to capture the response automatically.`);
+      showFallback(); // Show fallback immediately for cross-origin — user may need to paste manually
+      document.getElementById('retry-btn').style.display = 'none';
+
+      // Still try to extract via postMessage polling
+      pollTimer = setTimeout(() => postMessageExtractFlow(cfg), 5000);
+    }, 1500);
+  }).catch(() => {
+    setStatus('Clipboard failed — manual mode', 'err');
+    setInfo(`Copy the prompt below manually and paste into <b>${cfg.name}</b>, then paste the response here.`);
+    showFallback();
+  });
+}
+
+// ─── POSTMESSAGE EXTRACTION ───────────────────────────────────
+// Listen for any postMessage from the AI window — some AI sites
+// expose text via message events, or our injected listener fires
+let pmAttempts = 0;
+function postMessageExtractFlow(cfg) {
+  pmAttempts++;
+  setStatus('Listening for response via postMessage… (' + pmAttempts + ')', 'waiting');
+
+  // Try postMessage ping to AI window
+  try {
+    if (aiWin && !aiWin.closed) {
+      aiWin.postMessage({ type: 'pinforge_ping' }, '*');
+    }
+  } catch {}
+
+  if (pmAttempts < 20) {
+    pollTimer = setTimeout(() => postMessageExtractFlow(cfg), 2500);
+  }
+}
+
+// Listen for postMessages from AI window
+window.addEventListener('message', (evt) => {
+  if (!evt.data) return;
+  // If AI window sends back text somehow
+  const text = evt.data.text || evt.data.response || evt.data.content || '';
+  if (text && text.length > 50) {
+    const parsed = parseAI(text);
+    if (parsed) {
+      clearTimers();
+      if (aiWin && !aiWin.closed) aiWin.close();
+      sendResult(parsed);
+    }
+  }
+});
+
+// ─── MANUAL FALLBACK ─────────────────────────────────────────
+function manualSubmit() {
+  const raw = document.getElementById('manual-paste').value;
+  const parsed = parseAI(raw);
+  if (!parsed) {
+    document.getElementById('manual-err').textContent = '⚠ No valid JSON found. Make sure you copy the full response including { } braces.';
+    return;
+  }
+  document.getElementById('manual-err').textContent = '';
+  if (aiWin && !aiWin.closed) aiWin.close();
+  sendResult(parsed);
+}
+
+// ─── START ───────────────────────────────────────────────────
+startFlow();
+</script>
+</body>
+</html>
