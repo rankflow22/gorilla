@@ -2,6 +2,7 @@
   "version": 2,
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/relay.html", "dest": "/relay.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
