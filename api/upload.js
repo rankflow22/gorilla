@@ -3,14 +3,52 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
+  if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
-  const { provider, cloudName, uploadPreset, imgbbKey, imageBase64, fileName, mimeType } = req.body;
+  const { provider, imageBase64, fileName, mimeType,
+    cloudName, uploadPreset,
+    imgbbKey,
+    bunnyStorageZone, bunnyAccessKey, bunnyStorageRegion, bunnyCdnHostname, bunnyFolder
+  } = req.body;
 
   try {
+
+    if (provider === 'bunny') {
+      if (!bunnyStorageZone || !bunnyAccessKey || !bunnyCdnHostname) {
+        return res.status(400).json({ error: 'Missing bunnyStorageZone, bunnyAccessKey, or bunnyCdnHostname' });
+      }
+      const regionPrefix = (bunnyStorageRegion || '').toLowerCase().trim();
+      const storageHost = regionPrefix && regionPrefix !== 'de'
+        ? `${regionPrefix}.storage.bunnycdn.com`
+        : 'storage.bunnycdn.com';
+      const folder = (bunnyFolder || 'pinforge').replace(/^\/|\/$/g, '');
+      const safeFileName = `${Date.now()}-${(fileName || 'image.jpg').replace(/[^a-zA-Z0-9._-]/g, '-')}`;
+      const remotePath = `/${bunnyStorageZone}/${folder}/${safeFileName}`;
+      const buffer = Buffer.from(imageBase64, 'base64');
+      const uploadUrl = `https://${storageHost}${remotePath}`;
+      const r = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'AccessKey': bunnyAccessKey,
+          'Content-Type': mimeType || 'image/jpeg',
+        },
+        body: buffer,
+      });
+      if (!r.ok) {
+        const errText = await r.text();
+        throw new Error(`Bunny upload failed (${r.status}): ${errText.substring(0, 200)}`);
+      }
+      const cdnHost = bunnyCdnHostname.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const publicUrl = `https://${cdnHost}/${folder}/${safeFileName}`;
+      return res.status(200).json({ url: publicUrl });
+    }
+
     if (provider === 'cloudinary') {
-      if (!cloudName || !uploadPreset) return res.status(400).json({ error: 'Missing cloudName or uploadPreset' });
+      if (!cloudName || !uploadPreset) {
+        return res.status(400).json({ error: 'Missing cloudName or uploadPreset' });
+      }
       const boundary = '----FormBoundary' + Math.random().toString(36);
-      const dataUri = `data:${mimeType||'image/jpeg'};base64,${imageBase64}`;
+      const dataUri = `data:${mimeType || 'image/jpeg'};base64,${imageBase64}`;
       const body = [
         `--${boundary}`,
         'Content-Disposition: form-data; name="file"',
@@ -47,7 +85,8 @@ export default async function handler(req, res) {
     }
 
     res.status(400).json({ error: 'Unknown provider: ' + provider });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message || 'Upload error' });
   }
 }
