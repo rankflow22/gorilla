@@ -147,8 +147,8 @@ export default function handler(req, res) {
 
   // ── DOWNLOAD (extension fetches all pending jobs at once) ───
   if (action === 'download' && req.method === 'GET') {
-    const pending = store.jobs.filter(j => j.status === 'pending' || j.status === 'working');
-    pending.forEach(j => { if (j.status === 'working') j.status = 'pending'; });
+    // Only return truly pending jobs — never reset working/done
+    const pending = store.jobs.filter(j => j.status === 'pending');
     res.json({ jobs: pending });
     return;
   }
