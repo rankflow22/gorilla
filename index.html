@@ -533,6 +533,8 @@ async function genAllExt(){
     return{id:String(u.id),url:u.url,prompt:buildPrompt(u.url,pin.title||''),provider:ST.s.defProvider||'claude'};
   });
 
+  // Reset stale jobs first so previous project doesn't block
+  await fetch('/api/jobs?action=reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}).catch(()=>{});
   const r=await fetch('/api/jobs?action=enqueue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobs})});
   if(!r.ok){toast('Failed to enqueue jobs','err');return;}
   const d=await r.json();
@@ -552,6 +554,8 @@ function cancelBatch(){
   clearTimeout(ST._pollTimer);
   document.getElementById('batch-panel').style.display='none';
   document.getElementById('ga-btn').disabled=false;
+  // Clear jobs from server so extension stops
+  fetch('/api/jobs?action=reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}).catch(()=>{});
   toast('Batch cancelled','warn');
 }
 
