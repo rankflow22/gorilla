@@ -562,6 +562,7 @@ function cancelBatch(){
 async function pollResults(){
   if(!ST._batchRunning)return;
   const p=ga();if(!p)return;
+  // Keep polling even if some jobs error
 
   try{
     const r=await fetch('/api/jobs?action=results');
@@ -636,7 +637,7 @@ async function pollResults(){
 
   }catch(e){console.warn('poll error',e);}
 
-  ST._pollTimer=setTimeout(pollResults,2500);
+  ST._pollTimer=setTimeout(pollResults,1500);
 }
 
 function renderBatchList(urls){
