@@ -1,156 +1,92 @@
-// PinForge Jobs API
-// Uses global memory. On Vercel, keep instance warm by polling frequently.
-// The extension polls every 2.5s which keeps the instance alive.
-// Webapp polls every 2.5s too — same instance stays warm for entire session.
-
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-PinForge-Extension',
-};
-
-if (!global._pf) global._pf = { jobs: [], extTs: 0 };
-
-const store = global._pf;
-
-function markExt() { store.extTs = Date.now(); }
-function extAlive() { return Date.now() - store.extTs < 30000; }
-
-export default function handler(req, res) {
-  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
+  if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
-  if (req.headers['x-pinforge-extension']) markExt();
+  const { provider, imageBase64, fileName, mimeType,
+    cloudName, uploadPreset,
+    imgbbKey,
+    bunnyStorageZone, bunnyAccessKey, bunnyStorageRegion, bunnyCdnHostname, bunnyFolder
+  } = req.body;
 
-  const { action } = req.query;
+  try {
 
-  // ── PING ──────────────────────────────────────────────────
-  if (action === 'ping') {
-    res.json({
-      pinforge: true,
-      extensionOnline: extAlive(),
-      pending: store.jobs.filter(j => j.status === 'pending').length,
-      working: store.jobs.filter(j => j.status === 'working').length,
-      done:    store.jobs.filter(j => j.status === 'done').length,
-      total:   store.jobs.length,
-    });
-    return;
-  }
-
-  // ── QUEUE ─────────────────────────────────────────────────
-  if (action === 'queue') {
-    res.json({
-      jobs: store.jobs.slice(-100).map(j => ({
-        id: j.id, url: j.url, status: j.status, error: j.error || null
-      }))
-    });
-    return;
-  }
-
-  // ── NEXT (extension polls) ─────────────────────────────────
-  if (action === 'next' && req.method === 'GET') {
-    // Expire stale working jobs
-    store.jobs.forEach(j => {
-      if (j.status === 'working' && Date.now() - new Date(j.startedAt || 0).getTime() > 360000) {
-        j.status = 'error';
-        j.error = 'Timed out after 6 minutes';
+    if (provider === 'bunny') {
+      if (!bunnyStorageZone || !bunnyAccessKey || !bunnyCdnHostname) {
+        return res.status(400).json({ error: 'Missing bunnyStorageZone, bunnyAccessKey, or bunnyCdnHostname' });
       }
-    });
-    const busy = store.jobs.find(j => j.status === 'working');
-    if (busy) { res.json({ job: null }); return; }
-    const next = store.jobs.find(j => j.status === 'pending');
-    if (!next) { res.json({ job: null }); return; }
-    next.status = 'working';
-    next.startedAt = new Date().toISOString();
-    res.json({ job: { id: next.id, url: next.url, prompt: next.prompt, provider: next.provider } });
-    return;
-  }
-
-  // ── ENQUEUE ───────────────────────────────────────────────
-  if (action === 'enqueue' && req.method === 'POST') {
-    const { jobs: incoming } = req.body || {};
-    if (!Array.isArray(incoming)) { res.status(400).json({ error: 'jobs must be array' }); return; }
-    let added = 0;
-    for (const j of incoming) {
-      if (!j.id || !j.prompt) continue;
-      if (store.jobs.find(x => x.id === j.id)) continue;
-      store.jobs.push({
-        id: j.id, url: j.url || '', prompt: j.prompt,
-        provider: j.provider || 'claude', status: 'pending',
-        result: null, error: null,
-        createdAt: new Date().toISOString(), startedAt: null,
+      const regionPrefix = (bunnyStorageRegion || '').toLowerCase().trim();
+      const storageHost = regionPrefix && regionPrefix !== 'de'
+        ? `${regionPrefix}.storage.bunnycdn.com`
+        : 'storage.bunnycdn.com';
+      const folder = (bunnyFolder || 'pinforge').replace(/^\/|\/$/g, '');
+      const safeFileName = `${Date.now()}-${(fileName || 'image.jpg').replace(/[^a-zA-Z0-9._-]/g, '-')}`;
+      const remotePath = `/${bunnyStorageZone}/${folder}/${safeFileName}`;
+      const buffer = Buffer.from(imageBase64, 'base64');
+      const uploadUrl = `https://${storageHost}${remotePath}`;
+      const r = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'AccessKey': bunnyAccessKey,
+          'Content-Type': mimeType || 'image/jpeg',
+        },
+        body: buffer,
       });
-      added++;
+      if (!r.ok) {
+        const errText = await r.text();
+        throw new Error(`Bunny upload failed (${r.status}): ${errText.substring(0, 200)}`);
+      }
+      const cdnHost = bunnyCdnHostname.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const publicUrl = `https://${cdnHost}/${folder}/${safeFileName}`;
+      return res.status(200).json({ url: publicUrl });
     }
-    res.json({ ok: true, added, total: store.jobs.length });
-    return;
-  }
 
-  // ── COMPLETE ──────────────────────────────────────────────
-  if (action === 'complete' && req.method === 'POST') {
-    const { jobId, result } = req.body || {};
-    if (!jobId) { res.status(400).json({ error: 'Missing jobId' }); return; }
-    let job = store.jobs.find(j => j.id === jobId);
-    if (!job) {
-      // Cold-start miss — store as orphan so webapp can still get it
-      store.jobs.push({
-        id: jobId, url: '', prompt: '', provider: '', status: 'done',
-        result, error: null,
-        createdAt: new Date().toISOString(), startedAt: null,
-        completedAt: new Date().toISOString(),
+    if (provider === 'cloudinary') {
+      if (!cloudName || !uploadPreset) {
+        return res.status(400).json({ error: 'Missing cloudName or uploadPreset' });
+      }
+      const boundary = '----FormBoundary' + Math.random().toString(36);
+      const dataUri = `data:${mimeType || 'image/jpeg'};base64,${imageBase64}`;
+      const body = [
+        `--${boundary}`,
+        'Content-Disposition: form-data; name="file"',
+        '',
+        dataUri,
+        `--${boundary}`,
+        'Content-Disposition: form-data; name="upload_preset"',
+        '',
+        uploadPreset,
+        `--${boundary}--`,
+      ].join('\r\n');
+      const r = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        headers: { 'Content-Type': `multipart/form-data; boundary=${boundary}` },
+        body,
       });
-    } else {
-      job.status = 'done';
-      job.result = result;
-      job.completedAt = new Date().toISOString();
+      const d = await r.json();
+      if (d.secure_url) return res.status(200).json({ url: d.secure_url });
+      throw new Error(d.error?.message || 'Cloudinary upload failed');
     }
-    res.json({ ok: true });
-    return;
-  }
 
-  // ── FAIL ──────────────────────────────────────────────────
-  if (action === 'fail' && req.method === 'POST') {
-    const { jobId, error } = req.body || {};
-    if (!jobId) { res.status(400).json({ error: 'Missing jobId' }); return; }
-    let job = store.jobs.find(j => j.id === jobId);
-    if (!job) {
-      store.jobs.push({
-        id: jobId, url: '', prompt: '', provider: '', status: 'error',
-        result: null, error: error || 'Unknown',
-        createdAt: new Date().toISOString(), startedAt: null,
+    if (provider === 'imgbb') {
+      if (!imgbbKey) return res.status(400).json({ error: 'Missing imgbbKey' });
+      const params = new URLSearchParams();
+      params.append('image', imageBase64);
+      const r = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
       });
-    } else {
-      job.status = 'error';
-      job.error = error;
+      const d = await r.json();
+      if (d.success) return res.status(200).json({ url: d.data.url });
+      throw new Error(d.error?.message || 'ImgBB upload failed');
     }
-    res.json({ ok: true });
-    return;
-  }
 
-  // ── RESULTS (webapp polls for completed) ──────────────────
-  if (action === 'results' && req.method === 'GET') {
-    res.json({
-      results: store.jobs
-        .filter(j => j.status === 'done' || j.status === 'error')
-        .map(j => ({ id: j.id, status: j.status, result: j.result, error: j.error }))
-    });
-    return;
-  }
+    res.status(400).json({ error: 'Unknown provider: ' + provider });
 
-  // ── CLEAR (remove acknowledged jobs) ──────────────────────
-  if (action === 'clear' && req.method === 'POST') {
-    const { ids } = req.body || {};
-    if (Array.isArray(ids)) store.jobs = store.jobs.filter(j => !ids.includes(j.id));
-    res.json({ ok: true, remaining: store.jobs.length });
-    return;
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Upload error' });
   }
-
-  // ── RESET (new project / clear all) ───────────────────────
-  if (action === 'reset' && req.method === 'POST') {
-    store.jobs = [];
-    res.json({ ok: true });
-    return;
-  }
-
-  res.status(400).json({ error: 'Unknown action: ' + action });
 }
