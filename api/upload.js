@@ -21,9 +21,11 @@ export default async function handler(req, res) {
       const storageHost = regionPrefix && regionPrefix !== 'de'
         ? `${regionPrefix}.storage.bunnycdn.com`
         : 'storage.bunnycdn.com';
-      const folder = (bunnyFolder || 'pinforge').replace(/^\/|\/$/g, '');
+      const folder = (bunnyFolder || '').replace(/^\/|\/$/g, '');
       const safeFileName = `${Date.now()}-${(fileName || 'image.jpg').replace(/[^a-zA-Z0-9._-]/g, '-')}`;
-      const remotePath = `/${bunnyStorageZone}/${folder}/${safeFileName}`;
+      const remotePath = folder
+        ? `/${bunnyStorageZone}/${folder}/${safeFileName}`
+        : `/${bunnyStorageZone}/${safeFileName}`;
       const buffer = Buffer.from(imageBase64, 'base64');
       const uploadUrl = `https://${storageHost}${remotePath}`;
       const r = await fetch(uploadUrl, {
@@ -39,7 +41,9 @@ export default async function handler(req, res) {
         throw new Error(`Bunny upload failed (${r.status}): ${errText.substring(0, 200)}`);
       }
       const cdnHost = bunnyCdnHostname.replace(/^https?:\/\//, '').replace(/\/$/, '');
-      const publicUrl = `https://${cdnHost}/${folder}/${safeFileName}`;
+      const publicUrl = folder
+        ? `https://${cdnHost}/${folder}/${safeFileName}`
+        : `https://${cdnHost}/${safeFileName}`;
       return res.status(200).json({ url: publicUrl });
     }
 
