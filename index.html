@@ -482,9 +482,16 @@ async function checkExtension(){
   try{
     const r=await fetch('/api/jobs?action=ping');
     const d=await r.json();
-    const connected=d.pinforge===true;
-    ST._extConnected=connected;
-    setExtStatus(connected?'connected':'disconnected',connected?`Extension ready — ${d.pending||0} jobs pending`:'Extension not connected — install PinForge Extension');
+    // extensionOnline = extension has pinged within last 15s
+    const online=d.pinforge===true&&d.extensionOnline===true;
+    ST._extConnected=d.pinforge===true; // API reachable
+    if(online){
+      setExtStatus('connected',`⚡ Extension online — ${d.pending||0} jobs pending`);
+    }else if(d.pinforge){
+      setExtStatus('disconnected','Extension not connected — open Chrome extension popup → Connect');
+    }else{
+      setExtStatus('disconnected','Could not reach job API');
+    }
   }catch{
     ST._extConnected=false;
     setExtStatus('disconnected','Could not reach job API');
@@ -516,9 +523,9 @@ async function genAllExt(){
   const pending=p.urls.filter(u=>{const pin=p.pins.find(x=>x.urlId===u.id);return !pin||!pin.title;});
   if(!pending.length){toast('All pins already generated!','warn');return;}
 
-  // Check extension is connected
+  // Check extension status (warn but don't block — extension may connect shortly)
   await checkExtension();
-  if(!ST._extConnected){toast('Extension not connected — install PinForge Extension and connect it to this webapp URL','err');return;}
+  if(!ST._extConnected){toast('Job API not reachable — is webapp deployed?','err');return;}
 
   // Enqueue jobs
   const jobs=pending.map(u=>{
@@ -741,7 +748,7 @@ function restoreUI(){
 function init(){
   ld();restoreUI();upStats();renderProjs();renderAccounts();updateSchedUI();
   checkExtension();
-  setInterval(checkExtension,15000);
+  setInterval(checkExtension,5000);
 }
 init();
 </script>
