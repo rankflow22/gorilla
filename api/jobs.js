@@ -145,7 +145,15 @@ export default function handler(req, res) {
     return;
   }
 
-  // ── RESET (new project / clear all) ───────────────────────
+  // ── DOWNLOAD (extension fetches all pending jobs at once) ───
+  if (action === 'download' && req.method === 'GET') {
+    const pending = store.jobs.filter(j => j.status === 'pending' || j.status === 'working');
+    pending.forEach(j => { if (j.status === 'working') j.status = 'pending'; });
+    res.json({ jobs: pending });
+    return;
+  }
+
+    // ── RESET (new project / clear all) ───────────────────────
   if (action === 'reset' && req.method === 'POST') {
     store.jobs = [];
     res.json({ ok: true });
