@@ -9,7 +9,7 @@
 body{font-family:system-ui,sans-serif;background:#f8f7f5;display:flex;height:100vh;overflow:hidden;color:#111;font-size:14px}
 .sidebar{width:230px;min-width:230px;background:#fafafa;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;height:100vh}
 .logo{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px}
-.logo-icon{width:32px;height:32px;border-radius:8px;background:#E60023;display:flex;align-items:center;justify-content:center}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:#E60023;display:flex;align-items:center;justify-content:center;font-size:18px}
 .logo-title{font-size:14px;font-weight:700}.logo-sub{font-size:11px;color:#9ca3af}
 .ap-banner{margin:8px 10px 0;padding:8px 10px;background:#fff0f1;border:1px solid #fecdd3;border-radius:8px;display:none}
 .ap-banner.show{display:block}
@@ -27,7 +27,7 @@ h1{font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-.03em}
 .sub{font-size:13px;color:#6b7280;margin-bottom:20px}
 .btn{padding:7px 14px;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;background:#fff;color:#111;transition:all .15s}
 .btn:hover{background:#f9fafb}.btn.pr{background:#E60023;color:#fff;border-color:#E60023}.btn.pr:hover{background:#c0001e}
-.btn.pr:disabled,.btn:disabled{opacity:.5;cursor:not-allowed}.btn.sm{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}.btn.sm{padding:5px 10px;font-size:12px}
 .btn.danger{background:#fef2f2;color:#dc2626;border-color:#fecaca}
 .btn.green{background:#059669;color:#fff;border-color:#059669}.btn.green:hover{background:#047857}
 input,select,textarea{width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;color:#111;background:#fff}
@@ -46,15 +46,12 @@ textarea{resize:vertical;min-height:72px}
 .tx{cursor:pointer;color:#9ca3af;font-size:14px;line-height:1}
 .img-slot{width:76px;height:76px;border-radius:10px;border:1.5px dashed #d1d5db;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:#f9fafb;flex-shrink:0;font-size:10px;color:#9ca3af;text-align:center;gap:3px}
 .img-slot img{width:100%;height:100%;object-fit:cover}
-.prog{height:3px;background:#f3f4f6;border-radius:99px;overflow:hidden}
-.pf{height:100%;background:#E60023;border-radius:99px;transition:width .3s}
 .alert{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:12px;line-height:1.6}
 .ai{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
 .aw{background:#fffbeb;border:1px solid #fde68a;color:#78350f}
 .ao{background:#f0fdf4;border:1px solid #86efac;color:#166534}
 .ae{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
 .ap{background:#faf5ff;border:1px solid #d8b4fe;color:#7e22ce}
-.csv-wrap{overflow:auto;max-height:500px}
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{padding:9px 12px;background:#f9fafb;border-bottom:1px solid #e5e7eb;text-align:left;font-weight:500;white-space:nowrap;position:sticky;top:0;z-index:1}
 td{padding:7px 12px;border-bottom:1px solid #f3f4f6;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -94,19 +91,25 @@ tr:hover td{background:#f9fafb}
 .toast.ok{background:#059669}.toast.err{background:#dc2626}.toast.warn{background:#d97706}
 @keyframes ti{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .empty{text-align:center;padding:48px 0;color:#9ca3af}.ei{font-size:36px;margin-bottom:10px}
-.pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:#E60023;animation:pp 1s ease-in-out infinite;margin-right:4px}
-@keyframes pp{0%,100%{opacity:.3}50%{opacity:1}}
-@keyframes proganim{0%{width:10%}60%{width:80%}100%{width:10%}}
 .gen-pill{font-size:11px;padding:3px 10px;border-radius:99px;font-weight:500;flex-shrink:0}
 .gen-pill.pending{background:#f3f4f6;color:#6b7280}
-.gen-pill.generating{background:#fff0f1;color:#E60023;animation:pp 1s ease-in-out infinite}
+.gen-pill.working{background:#fff0f1;color:#E60023}
 .gen-pill.done{background:#d1fae5;color:#065f46}
+.gen-pill.error{background:#fee2e2;color:#991b1b}
 .gen-pill.skipped{background:#f3f4f6;color:#9ca3af}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.gen-pill.working{animation:pulse 1s ease-in-out infinite}
+/* Extension status bar */
+.ext-bar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:16px;font-size:12px}
+.ext-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#d1d5db}
+.ext-dot.connected{background:#22c55e}
+.ext-dot.working{background:#f59e0b;animation:pulse 1s ease-in-out infinite}
+.ext-dot.disconnected{background:#ef4444}
+.batch-bar-wrap{height:5px;background:#f3f4f6;border-radius:99px;overflow:hidden;margin:6px 0}
+.batch-bar-fill{height:100%;background:#E60023;border-radius:99px;transition:width .4s}
 .url-gen-row{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid #f3f4f6}
 .url-gen-row:last-child{border-bottom:none}
-.url-chip{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.batch-bar-wrap{height:6px;background:#f3f4f6;border-radius:99px;overflow:hidden;margin:6px 0}
-.batch-bar-fill{height:100%;background:#E60023;border-radius:99px;transition:width .4s}
+.url-chip{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#374151}
 .mp-tag{display:inline-block;background:#fff;border:1px solid #E60023;color:#E60023;border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace}
 </style>
 </head>
@@ -114,19 +117,19 @@ tr:hover td{background:#f9fafb}
 
 <div class="sidebar">
   <div class="logo">
-    <div class="logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg></div>
+    <div class="logo-icon">📌</div>
     <div><div class="logo-title">PinForge</div><div class="logo-sub">Pinterest Generator</div></div>
   </div>
   <div class="ap-banner" id="apb"><div class="apl">Active project</div><div class="apn" id="apn">—</div></div>
   <nav>
-    <button class="nb active" onclick="showTab('settings',this)"><span style="font-size:15px">⚙️</span> Settings</button>
-    <button class="nb" onclick="showTab('accounts',this)"><span style="font-size:15px">👤</span> Accounts & Boards</button>
-    <button class="nb" onclick="showTab('projects',this)"><span style="font-size:15px">📁</span> Projects</button>
-    <button class="nb" onclick="showTab('urls',this)"><span style="font-size:15px">🔗</span> URLs</button>
-    <button class="nb" onclick="showTab('images',this)"><span style="font-size:15px">🖼️</span> Images</button>
-    <button class="nb" onclick="showTab('pins',this)"><span style="font-size:15px">📌</span> Pin Generator</button>
-    <button class="nb" onclick="showTab('schedule',this)"><span style="font-size:15px">🗓</span> Schedule</button>
-    <button class="nb" onclick="showTab('export',this)"><span style="font-size:15px">📥</span> Export CSV</button>
+    <button class="nb active" onclick="showTab('settings',this)">⚙️ Settings</button>
+    <button class="nb" onclick="showTab('accounts',this)">👤 Accounts & Boards</button>
+    <button class="nb" onclick="showTab('projects',this)">📁 Projects</button>
+    <button class="nb" onclick="showTab('urls',this)">🔗 URLs</button>
+    <button class="nb" onclick="showTab('images',this)">🖼️ Images</button>
+    <button class="nb" onclick="showTab('pins',this)">📌 Pin Generator</button>
+    <button class="nb" onclick="showTab('schedule',this)">🗓 Schedule</button>
+    <button class="nb" onclick="showTab('export',this)">📥 Export CSV</button>
   </nav>
   <div class="sidebar-stats">
     <div style="font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">This project</div>
@@ -141,40 +144,45 @@ tr:hover td{background:#f9fafb}
 
 <!-- ══ SETTINGS ══ -->
 <div class="tab active" id="tab-settings">
-  <h1>Settings</h1><p class="sub">All settings saved permanently in your browser.</p>
+  <h1>Settings</h1><p class="sub">Configure extension connection, AI provider, image hosting and master prompt.</p>
 
   <div class="card">
-    <div class="ch">🚀 How It Works — Zero API Cost</div>
+    <div class="ch">🔌 Extension Connection</div>
     <div class="cb">
       <div class="alert ap mb">
-        <b>No AI API key needed.</b> When you click Generate, PinForge opens a popup window to ChatGPT / Claude / Gemini with the prompt pre-copied. Paste into AI, paste response back → pin auto-filled. Works with any free or paid AI account.
+        <b>How it works:</b> Install the PinForge Chrome Extension → enter this webapp URL in the extension popup → the extension polls here for jobs, injects prompts into Claude/ChatGPT/Gemini automatically, and sends results back. <b>100% hands-free for all 100 URLs.</b>
       </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <div style="flex:1;min-width:200px;background:#f9fafb;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.7">
-          <div style="font-weight:600;margin-bottom:4px">Single pin flow</div>
-          Click ✨ Generate → popup opens → copy-paste → done
+      <div class="ext-bar" id="ext-bar">
+        <div class="ext-dot disconnected" id="ext-dot"></div>
+        <span id="ext-status-text">Extension not connected — install PinForge Extension first</span>
+        <button class="btn sm" onclick="checkExtension()" style="margin-left:auto">Check</button>
+      </div>
+      <div class="r2 mb">
+        <div>
+          <label>Default AI Provider</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="def-prov-btns">
+            <button class="prov-pill sel" id="dp-claude" onclick="selDefProv('claude',this)">Claude</button>
+            <button class="prov-pill" id="dp-chatgpt" onclick="selDefProv('chatgpt',this)">ChatGPT</button>
+            <button class="prov-pill" id="dp-gemini" onclick="selDefProv('gemini',this)">Gemini</button>
+          </div>
         </div>
-        <div style="flex:1;min-width:200px;background:#f9fafb;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.7">
-          <div style="font-weight:600;margin-bottom:4px">Batch flow (Generate All)</div>
-          Progress panel shows all URLs → walks through one by one → each auto-advances after Apply
+        <div>
+          <label>Concurrent Jobs</label>
+          <select id="concurrent-sel" onchange="ST.s.concurrent=parseInt(this.value);sv()">
+            <option value="1" selected>1 at a time (recommended)</option>
+            <option value="1">1 — safest, no rate limits</option>
+          </select>
+          <div style="font-size:11px;color:#9ca3af;margin-top:4px">Extension processes one URL at a time sequentially</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="ch">✍️ Master Prompt Template <span id="mp-saved" style="font-size:11px;color:#059669;font-weight:400"></span></div>
+    <div class="ch">✍️ Master Prompt Template</div>
     <div class="cb">
       <div class="alert ai mb">
         Placeholders: <span class="mp-tag">{url}</span> <span class="mp-tag">{slug}</span> <span class="mp-tag">{domain}</span> <span class="mp-tag">{boards_instruction}</span> <span class="mp-tag">{board_instruction}</span>
-      </div>
-      <div class="mb">
-        <label>Default AI to open when generating</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="def-prov-btns">
-          <button class="prov-pill sel" id="dp-claude" onclick="selDefProv('claude',this)">Claude</button>
-          <button class="prov-pill" id="dp-chatgpt" onclick="selDefProv('chatgpt',this)">ChatGPT</button>
-          <button class="prov-pill" id="dp-gemini" onclick="selDefProv('gemini',this)">Gemini</button>
-        </div>
       </div>
       <div class="mb">
         <label>Master Prompt</label>
@@ -188,21 +196,15 @@ tr:hover td{background:#f9fafb}
   </div>
 
   <div class="card">
-    <div class="ch">🐰 Bunny.net Storage (Recommended — Fast CDN)</div>
+    <div class="ch">🐰 Bunny.net Storage</div>
     <div class="cb">
-      <div class="alert ao mb">
-        <b>Setup:</b> Create a Storage Zone at <a href="https://dash.bunny.net" target="_blank">dash.bunny.net</a> → connect a Pull Zone to it → copy credentials below.<br>
-        Storage Zone Password = AccessKey. Pull Zone hostname = CDN URL base.
-      </div>
+      <div class="alert ao mb">Create Storage Zone at <a href="https://dash.bunny.net" target="_blank">dash.bunny.net</a> → connect Pull Zone → copy credentials below.</div>
       <div class="r2 mb">
         <div><label>Storage Zone Name</label><input type="text" id="bunny-zone" placeholder="my-pinforge-zone" oninput="ST.s.bunnyZone=this.value;sv()"></div>
-        <div><label>Storage Zone Password (AccessKey)</label>
-          <div style="display:flex;gap:6px">
-            <input type="password" id="bunny-key" placeholder="••••••••••••" style="font-family:monospace;flex:1" oninput="ST.s.bunnyKey=this.value;sv()">
-            <button class="btn sm" onclick="tvk('bunny-key',this)">Show</button>
-          </div>
+        <div><label>AccessKey (Storage Password)</label>
+          <div style="display:flex;gap:6px"><input type="password" id="bunny-key" placeholder="••••••••" style="font-family:monospace;flex:1" oninput="ST.s.bunnyKey=this.value;sv()"><button class="btn sm" onclick="tvk('bunny-key',this)">Show</button></div>
         </div>
-        <div><label>Storage Region <span style="font-size:11px;color:#9ca3af">(leave blank = Frankfurt/DE)</span></label>
+        <div><label>Storage Region</label>
           <select id="bunny-region" onchange="ST.s.bunnyRegion=this.value;sv()">
             <option value="">DE — Frankfurt (default)</option>
             <option value="ny">NY — New York</option>
@@ -211,35 +213,25 @@ tr:hover td{background:#f9fafb}
             <option value="uk">UK — London</option>
             <option value="se">SE — Stockholm</option>
             <option value="br">BR — São Paulo</option>
-            <option value="jh">JH — Johannesburg</option>
             <option value="syd">SYD — Sydney</option>
           </select>
         </div>
-        <div><label>CDN Hostname (from Pull Zone) <span style="font-size:11px;color:#9ca3af">e.g. mypins.b-cdn.net</span></label>
-          <input type="text" id="bunny-cdn" placeholder="mypins.b-cdn.net" oninput="ST.s.bunnyCdn=this.value;sv()">
-        </div>
+        <div><label>CDN Hostname (Pull Zone)</label><input type="text" id="bunny-cdn" placeholder="mypins.b-cdn.net" oninput="ST.s.bunnyCdn=this.value;sv()"></div>
       </div>
-      <div class="mb">
-        <label>Upload Folder (optional, default: pinforge)</label>
-        <input type="text" id="bunny-folder" placeholder="pinforge/images" style="max-width:280px" oninput="ST.s.bunnyFolder=this.value;sv()">
-      </div>
+      <div class="mb"><label>Upload Folder</label><input type="text" id="bunny-folder" placeholder="pinforge" style="max-width:200px" oninput="ST.s.bunnyFolder=this.value;sv()"></div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn sm" onclick="testBunny()">Test Bunny Upload</button>
+        <button class="btn sm" onclick="testBunny()">Test Upload</button>
         <span id="bunny-msg" style="font-size:12px;color:#6b7280"></span>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="ch">🖼️ ImgBB Image Hosting (Free)</div>
+    <div class="ch">🖼️ ImgBB (Free Alternative)</div>
     <div class="cb">
-      <div class="alert ao mb">Get free API key at <a href="https://api.imgbb.com" target="_blank">api.imgbb.com</a> — no credit card needed.</div>
       <div style="max-width:420px" class="mb">
-        <label>ImgBB API Key</label>
-        <div style="display:flex;gap:8px">
-          <input type="password" id="ibb-key" placeholder="paste your imgbb key" style="font-family:monospace" oninput="ST.s.imgbbKey=this.value;sv()">
-          <button class="btn sm" onclick="tvk('ibb-key',this)">Show</button>
-        </div>
+        <label>ImgBB API Key — get free at <a href="https://api.imgbb.com" target="_blank">api.imgbb.com</a></label>
+        <div style="display:flex;gap:8px"><input type="password" id="ibb-key" placeholder="paste key" style="font-family:monospace" oninput="ST.s.imgbbKey=this.value;sv()"><button class="btn sm" onclick="tvk('ibb-key',this)">Show</button></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn sm" onclick="testImgBB()">Test ImgBB</button>
@@ -249,14 +241,14 @@ tr:hover td{background:#f9fafb}
   </div>
 
   <div class="card">
-    <div class="ch">☁️ Cloudinary Image Hosting</div>
+    <div class="ch">☁️ Cloudinary</div>
     <div class="cb">
-      <div class="alert ao mb">Free at <a href="https://cloudinary.com" target="_blank">cloudinary.com</a> — Settings → Upload → Upload presets → Add preset → set to <b>Unsigned</b></div>
+      <div class="alert ao mb">Free at <a href="https://cloudinary.com" target="_blank">cloudinary.com</a> — Settings → Upload Presets → Add unsigned preset</div>
       <div class="r3">
-        <div><label>Cloud Name</label><input type="text" id="cld-cloud" placeholder="your-cloud-name" oninput="ST.s.cldCloud=this.value;sv()"></div>
-        <div><label>Upload Preset (Unsigned)</label><input type="text" id="cld-preset" placeholder="ml_default" oninput="ST.s.cldPreset=this.value;sv()"></div>
+        <div><label>Cloud Name</label><input type="text" id="cld-cloud" placeholder="your-cloud" oninput="ST.s.cldCloud=this.value;sv()"></div>
+        <div><label>Upload Preset (unsigned)</label><input type="text" id="cld-preset" placeholder="ml_default" oninput="ST.s.cldPreset=this.value;sv()"></div>
         <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:6px">
-          <button class="btn sm" onclick="testCloudinary()">Test Cloudinary</button>
+          <button class="btn sm" onclick="testCloudinary()">Test</button>
           <span id="cld-msg" style="font-size:11px;color:#6b7280"></span>
         </div>
       </div>
@@ -267,7 +259,7 @@ tr:hover td{background:#f9fafb}
     <div class="ch">🪣 Active Image Storage</div>
     <div class="cb">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="stor-btn sel" id="st-none" onclick="selStor('none')">None (local only)</button>
+        <button class="stor-btn sel" id="st-none" onclick="selStor('none')">None (local)</button>
         <button class="stor-btn" id="st-bunny" onclick="selStor('bunny')">🐰 Bunny.net</button>
         <button class="stor-btn" id="st-cloudinary" onclick="selStor('cloudinary')">☁️ Cloudinary</button>
         <button class="stor-btn" id="st-imgbb" onclick="selStor('imgbb')">🖼️ ImgBB</button>
@@ -277,31 +269,23 @@ tr:hover td{background:#f9fafb}
   </div>
 </div>
 
-<!-- ══ ACCOUNTS & BOARDS ══ -->
+<!-- ══ ACCOUNTS ══ -->
 <div class="tab" id="tab-accounts">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
-    <div><h1>Accounts & Boards</h1><p class="sub">Each account has its own board list. Available across all projects.</p></div>
+    <div><h1>Accounts & Boards</h1><p class="sub">Each account has its own board list.</p></div>
     <button class="btn pr" onclick="showAddAccForm()">+ Add Account</button>
   </div>
   <div id="add-acc-form" style="display:none;padding:16px;background:#fff9f9;border:1px solid #fecdd3;border-radius:10px;margin-bottom:16px">
     <div class="r2 mb">
-      <div><label>Account Name / Handle</label><input type="text" id="acc-name-inp" placeholder="e.g. @mybrand" onkeydown="if(event.key==='Enter')document.getElementById('acc-url-inp').focus()"></div>
-      <div><label>Pinterest Profile URL (optional)</label><input type="text" id="acc-url-inp" placeholder="https://pinterest.com/mybrand" onkeydown="if(event.key==='Enter')saveNewAcc()"></div>
+      <div><label>Account Name</label><input type="text" id="acc-name-inp" placeholder="@mybrand" onkeydown="if(event.key==='Enter')document.getElementById('acc-url-inp').focus()"></div>
+      <div><label>Pinterest URL (optional)</label><input type="text" id="acc-url-inp" placeholder="https://pinterest.com/mybrand" onkeydown="if(event.key==='Enter')saveNewAcc()"></div>
     </div>
     <div class="mb">
       <label>Board Names</label>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <input type="text" id="new-acc-board-inp" placeholder="Board name e.g. Summer Fashion..." style="flex:1" onkeydown="if(event.key==='Enter')addNewAccBoard()">
-        <button class="btn sm pr" onclick="addNewAccBoard()">+ Add Board</button>
-      </div>
-      <div id="new-acc-boards" style="min-height:36px;padding:6px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;display:flex;flex-wrap:wrap;gap:4px">
-        <span id="new-acc-boards-empty" style="font-size:12px;color:#9ca3af;padding:4px">No boards added yet</span>
-      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px"><input type="text" id="new-acc-board-inp" placeholder="Board name e.g. Summer Fashion" style="flex:1" onkeydown="if(event.key==='Enter')addNewAccBoard()"><button class="btn sm pr" onclick="addNewAccBoard()">+ Add</button></div>
+      <div id="new-acc-boards" style="min-height:36px;padding:6px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;display:flex;flex-wrap:wrap;gap:4px"><span id="new-acc-boards-empty" style="font-size:12px;color:#9ca3af;padding:4px">No boards yet</span></div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn pr" onclick="saveNewAcc()">Save Account</button>
-      <button class="btn" onclick="cancelAddAcc()">Cancel</button>
-    </div>
+    <div style="display:flex;gap:8px"><button class="btn pr" onclick="saveNewAcc()">Save Account</button><button class="btn" onclick="cancelAddAcc()">Cancel</button></div>
   </div>
   <div id="acc-list"></div>
   <div class="empty" id="acc-empty"><div class="ei">👤</div><p style="margin-bottom:12px">No accounts yet</p><button class="btn pr" onclick="showAddAccForm()">Add first account</button></div>
@@ -310,42 +294,31 @@ tr:hover td{background:#f9fafb}
 <!-- ══ PROJECTS ══ -->
 <div class="tab" id="tab-projects">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
-    <div><h1>Projects</h1><p class="sub">Each campaign is a project. Switch anytime — all data saved permanently.</p></div>
+    <div><h1>Projects</h1><p class="sub">Each campaign is a project. All data saved permanently.</p></div>
     <button class="btn pr" onclick="showNPF()">+ New Project</button>
   </div>
   <div id="np-form" style="display:none;padding:14px;background:#fff9f9;border:1px solid #fecdd3;border-radius:10px;margin-bottom:16px">
     <label style="margin-bottom:6px">Project name</label>
-    <div style="display:flex;gap:8px">
-      <input type="text" id="np-name" placeholder="e.g. Summer Collection..." style="flex:1" onkeydown="if(event.key==='Enter')createProj()">
-      <button class="btn pr" onclick="createProj()">Create</button>
-      <button class="btn" onclick="document.getElementById('np-form').style.display='none'">Cancel</button>
-    </div>
+    <div style="display:flex;gap:8px"><input type="text" id="np-name" placeholder="e.g. Summer Collection" style="flex:1" onkeydown="if(event.key==='Enter')createProj()"><button class="btn pr" onclick="createProj()">Create</button><button class="btn" onclick="document.getElementById('np-form').style.display='none'">Cancel</button></div>
   </div>
-  <div class="alert aw">💡 Workflow: Create project → assign account → add URLs → generate pins → upload images → export CSV</div>
   <div id="proj-list" style="margin-top:12px"></div>
   <div class="empty" id="proj-empty"><div class="ei">📁</div><p style="margin-bottom:12px">No projects yet</p><button class="btn pr" onclick="showNPF()">Create first project</button></div>
 </div>
 
 <!-- ══ URLS ══ -->
 <div class="tab" id="tab-urls">
-  <h1>URLs</h1><p class="sub">Add destination URLs. AI generates a Pinterest pin for each one.</p>
-  <div style="display:flex;gap:8px;margin-bottom:12px">
-    <input type="url" id="url-inp" placeholder="https://yoursite.com/blog/post-title" style="flex:1" onkeydown="if(event.key==='Enter')addUrl()">
-    <button class="btn pr" onclick="addUrl()">+ Add</button>
-  </div>
-  <div style="display:flex;gap:8px;margin-bottom:20px">
-    <textarea id="bulk-inp" placeholder="Paste multiple URLs — one per line..." style="flex:1;min-height:80px"></textarea>
-    <button class="btn" style="align-self:flex-end" onclick="addBulkUrls()">Add All</button>
-  </div>
+  <h1>URLs</h1><p class="sub">Add destination URLs. Extension generates a pin for each one automatically.</p>
+  <div style="display:flex;gap:8px;margin-bottom:12px"><input type="url" id="url-inp" placeholder="https://yoursite.com/blog/post-title" style="flex:1" onkeydown="if(event.key==='Enter')addUrl()"><button class="btn pr" onclick="addUrl()">+ Add</button></div>
+  <div style="display:flex;gap:8px;margin-bottom:20px"><textarea id="bulk-inp" placeholder="Paste multiple URLs — one per line..." style="flex:1;min-height:80px"></textarea><button class="btn" style="align-self:flex-end" onclick="addBulkUrls()">Add All</button></div>
   <div id="url-list"></div>
 </div>
 
 <!-- ══ IMAGES ══ -->
 <div class="tab" id="tab-images">
   <h1>Images — Bulk Upload</h1>
-  <p class="sub">Upload all images at once. Auto-assigns to matching pins by filename.</p>
+  <p class="sub">Upload all images. Auto-assigns to matching pins by filename.</p>
   <div class="alert ai mb16"><b>Tip:</b> Name files to match pin topics. "summer-fashion.jpg" → matches "Summer Fashion Tips" pin.</div>
-  <div style="border:2px dashed #e5e7eb;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:16px" id="drop-zone"
+  <div style="border:2px dashed #e5e7eb;border-radius:12px;padding:32px;text-align:center;cursor:pointer;margin-bottom:16px" id="drop-zone"
     onclick="document.getElementById('bulk-img-inp').click()"
     ondragover="event.preventDefault();this.style.borderColor='#E60023'"
     ondragleave="this.style.borderColor='#e5e7eb'"
@@ -356,11 +329,8 @@ tr:hover td{background:#f9fafb}
     <input type="file" id="bulk-img-inp" accept="image/*" multiple style="display:none" onchange="handleBulkImgs(this.files)">
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div style="font-size:13px;font-weight:500" id="img-bank-count">No images uploaded</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn sm" onclick="autoAssignAll()">✨ Auto-Assign All</button>
-      <button class="btn sm danger" onclick="clearImgBank()">Clear All</button>
-    </div>
+    <div style="font-size:13px;font-weight:500" id="img-bank-count">No images</div>
+    <div style="display:flex;gap:8px"><button class="btn sm" onclick="autoAssignAll()">✨ Auto-Assign</button><button class="btn sm danger" onclick="clearImgBank()">Clear All</button></div>
   </div>
   <div id="img-bank" class="img-bank-grid"></div>
   <div class="empty" id="img-empty"><div class="ei">🖼️</div><p>No images yet</p></div>
@@ -373,25 +343,31 @@ tr:hover td{background:#f9fafb}
 <!-- ══ PINS ══ -->
 <div class="tab" id="tab-pins">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-    <div><h1>Pin Generator</h1><p class="sub">Opens ChatGPT / Claude / Gemini — paste prompt in AI, paste result back → auto-fills pin</p></div>
+    <div><h1>Pin Generator</h1><p class="sub">Extension injects prompts into AI automatically — fully hands-free</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
       <button class="btn sm" onclick="copyTitles()">📋 Titles</button>
       <button class="btn sm" onclick="copyDescs()">📋 Descs</button>
-      <button class="btn pr" id="ga-btn" onclick="genAllFlow()">✨ Generate All</button>
+      <button class="btn pr" id="ga-btn" onclick="genAllExt()">⚡ Generate All (Extension)</button>
     </div>
   </div>
 
-  <!-- Batch progress panel (shown during Generate All) -->
+  <!-- Extension status -->
+  <div class="ext-bar" id="pins-ext-bar">
+    <div class="ext-dot disconnected" id="pins-ext-dot"></div>
+    <span id="pins-ext-text">Checking extension…</span>
+  </div>
+
+  <!-- Batch progress -->
   <div id="batch-panel" style="display:none;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:13px;font-weight:600" id="batch-status-text">Ready</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:13px;font-weight:600" id="batch-status-text">Starting…</span>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:12px;color:#6b7280" id="batch-count-text">0 / 0</span>
         <button class="btn sm danger" onclick="cancelBatch()">✕ Cancel</button>
       </div>
     </div>
     <div class="batch-bar-wrap"><div class="batch-bar-fill" id="batch-bar" style="width:0%"></div></div>
-    <div id="batch-url-list" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff;margin-top:8px"></div>
+    <div id="batch-url-list" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff;margin-top:8px;max-height:200px;overflow-y:auto"></div>
   </div>
 
   <div id="pins-cont"></div>
@@ -401,30 +377,12 @@ tr:hover td{background:#f9fafb}
 <!-- ══ SCHEDULE ══ -->
 <div class="tab" id="tab-schedule">
   <h1>Schedule</h1>
-  <p class="sub">Generate publish times for your Pinterest CSV.</p>
-  <div class="alert ao mb">Pinterest uses your account timezone — just enter local times.</div>
+  <div class="alert ao mb">Pinterest uses your account timezone — enter local times.</div>
   <div class="r2 mb16">
     <div><label>Start Date</label><input type="date" id="sc-date"></div>
-    <div><label>Pins Per Day</label>
-      <select id="sc-ppd">
-        <option>1</option><option>2</option><option>3</option><option>4</option>
-        <option>5</option><option>6</option><option selected>7</option><option>8</option>
-        <option>10</option><option>12</option><option>15</option><option>20</option>
-      </select>
-    </div>
-    <div><label>Gap Between Pins</label>
-      <select id="sc-int">
-        <option value="30">30 minutes</option>
-        <option value="60" selected>1 hour</option>
-        <option value="90">1.5 hours</option>
-        <option value="120">2 hours</option>
-        <option value="180">3 hours</option>
-        <option value="240">4 hours</option>
-      </select>
-    </div>
-    <div><label>Account for schedule</label>
-      <select id="sc-acc"><option value="">— select account —</option></select>
-    </div>
+    <div><label>Pins Per Day</label><select id="sc-ppd"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option selected>7</option><option>8</option><option>10</option><option>12</option><option>15</option><option>20</option></select></div>
+    <div><label>Gap Between Pins</label><select id="sc-int"><option value="30">30 min</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></div>
+    <div><label>Account</label><select id="sc-acc"><option value="">— select —</option></select></div>
   </div>
   <div class="mb16">
     <div style="font-size:13px;font-weight:500;margin-bottom:8px">Publishing Windows</div>
@@ -442,20 +400,14 @@ tr:hover td{background:#f9fafb}
 <div class="tab" id="tab-export">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
     <div><h1>Export Pinterest CSV</h1><p class="sub">Click any cell to edit inline. Exact Pinterest format.</p></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn" onclick="buildExport()">🔄 Refresh</button>
-      <button class="btn pr" onclick="dlCSV()">⬇ Download CSV</button>
-    </div>
+    <div style="display:flex;gap:8px"><button class="btn" onclick="buildExport()">🔄 Refresh</button><button class="btn pr" onclick="dlCSV()">⬇ Download CSV</button></div>
   </div>
-  <div class="alert ao mb" style="font-size:12px">
-    <b>Rules:</b> Board must match exactly · Image URL must be a public link (Bunny/Cloudinary/ImgBB) · Keywords space-separated no # · Date format: <code>2025-08-15 08:00:00</code>
-    <div style="margin-top:6px"><button class="btn sm" onclick="dlSampleCSV()">📄 Download Sample CSV</button></div>
-  </div>
+  <div class="alert ao mb" style="font-size:12px">Board must match exactly · Image URL must be public link · Keywords space-separated no # · Date: <code>2025-08-15 08:00:00</code><br><button class="btn sm" style="margin-top:6px" onclick="dlSampleCSV()">📄 Sample CSV</button></div>
   <div id="exp-cont"></div>
-  <div class="empty" id="exp-empty"><div class="ei">📄</div><p>Generate pins first, then export here</p></div>
+  <div class="empty" id="exp-empty"><div class="ei">📄</div><p>Generate pins first</p></div>
 </div>
 
-</div><!-- /main -->
+</div>
 <div id="toast-area"></div>
 
 <script>
@@ -463,14 +415,6 @@ tr:hover td{background:#f9fafb}
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════
 const CSV_HDRS = ['Title','Description','Link','Image URL (link)','Board','Keywords','Publish date','Note'];
-const BC_CHANNEL = 'pinforge_relay_' + location.hostname;
-
-const AI_URLS = {
-  claude:  'https://claude.ai/new',
-  chatgpt: 'https://chatgpt.com',
-  gemini:  'https://gemini.google.com'
-};
-
 const DEFAULT_PROMPT = `You are a professional Pinterest content writer. Write content for this specific URL.
 
 URL: {url}
@@ -480,23 +424,22 @@ Page topic (from slug): "{slug}"
 WRITE THESE 4 FIELDS:
 
 1. TITLE (40-80 characters):
-- Start with a number OR power opener: "Why","How to","The","Stop","What","These","This"
-- Be specific to the exact topic — use actual subject from the URL slug
-- Promise a clear measurable benefit or create genuine curiosity
+- Start with number OR power opener: "Why","How to","The","Stop","What","These","This"
+- Specific to the exact topic from the URL slug
+- Clear measurable benefit or genuine curiosity
 - BANNED: Discover, Amazing, Awesome, Check out, Click here
 
 2. DESCRIPTION (200-400 characters):
-- Write exactly 3 sentences
+- Exactly 3 sentences
 - Sentence 1: One specific concrete benefit or fact about "{slug}"
 - Sentence 2: A specific detail, number, or tip with real value
-- Sentence 3: One soft action phrase (e.g. "Save for your next project" or "Try this tonight")
-- Weave 3-4 SEO keywords naturally inside sentences — NOT listed separately
+- Sentence 3: One soft action phrase (e.g. "Save for later" or "Try this tonight")
+- Weave 3-4 SEO keywords naturally — NOT listed separately
 - End with exactly 1-2 hashtags
-- BANNED openings: "Discover","Are you","Do you want","Looking for","Check out","Save this pin"
+- BANNED openings: "Discover","Are you","Do you want","Looking for","Check out"
 
 3. TAGS (exactly 5 keywords):
 - Real Pinterest search terms people actually type
-- Specific to "{slug}" — not generic
 - Mix: 1 broad, 2 specific, 1 audience, 1 action/result
 - Format: comma-separated phrases, no # symbol
 
@@ -509,353 +452,199 @@ Return ONLY this JSON, nothing else:
 // STATE
 // ═══════════════════════════════════════════════════════════════
 const ST = {
-  s: {
-    defProvider:'claude', masterPrompt:DEFAULT_PROMPT,
-    storProv:'none',
-    bunnyZone:'', bunnyKey:'', bunnyRegion:'', bunnyCdn:'', bunnyFolder:'pinforge',
-    cldCloud:'', cldPreset:'',
-    imgbbKey:''
-  },
-  accounts:[], projects:[], aid:null, imgBank:[],
+  s:{defProvider:'claude',masterPrompt:DEFAULT_PROMPT,storProv:'none',bunnyZone:'',bunnyKey:'',bunnyRegion:'',bunnyCdn:'',bunnyFolder:'pinforge',cldCloud:'',cldPreset:'',imgbbKey:''},
+  accounts:[],projects:[],aid:null,imgBank:[],
   _newBoards:[],
-  _batchQueue:[], _batchIdx:0, _batchRunning:false,
-  _relayWin:null, _bcListener:null
+  _batchRunning:false,_batchQueue:[],_batchIdx:0,
+  _pollTimer:null,_extConnected:false
 };
 
 // ─── PERSIST ─────────────────────────────────────────────────
-function sv() {
-  try {
-    localStorage.setItem('pf8', JSON.stringify({
-      s:ST.s, accounts:ST.accounts, projects:ST.projects, aid:ST.aid,
-      imgBank:ST.imgBank.map(i=>({id:i.id,name:i.name,dataUrl:i.dataUrl,hostedUrl:i.hostedUrl,assignedPinId:i.assignedPinId}))
-    }));
-  } catch(e){ console.warn('save err',e); }
-}
-function ld() {
-  try {
-    const d = JSON.parse(localStorage.getItem('pf8')||'{}');
-    if(d.s) Object.assign(ST.s, d.s);
-    if(d.accounts) ST.accounts = d.accounts;
-    if(d.projects) ST.projects = d.projects;
-    if(d.aid) ST.aid = d.aid;
-    if(d.imgBank) ST.imgBank = d.imgBank;
-  } catch{}
-}
-function ga() { return ST.projects.find(p=>p.id===ST.aid)||null; }
-function getAccById(id) { return ST.accounts.find(a=>a.id===id)||null; }
-function getActiveAcc() { const p=ga(); return p?getAccById(p.accountId)||null:null; }
-function getActiveBoardList() { const a=getActiveAcc(); return a?a.boards:[]; }
+function sv(){try{localStorage.setItem('pf9',JSON.stringify({s:ST.s,accounts:ST.accounts,projects:ST.projects,aid:ST.aid,imgBank:ST.imgBank.map(i=>({id:i.id,name:i.name,dataUrl:i.dataUrl,hostedUrl:i.hostedUrl,assignedPinId:i.assignedPinId}))}));}catch(e){}}
+function ld(){try{const d=JSON.parse(localStorage.getItem('pf9')||'{}');if(d.s)Object.assign(ST.s,d.s);if(d.accounts)ST.accounts=d.accounts;if(d.projects)ST.projects=d.projects;if(d.aid)ST.aid=d.aid;if(d.imgBank)ST.imgBank=d.imgBank;}catch{}}
+function ga(){return ST.projects.find(p=>p.id===ST.aid)||null;}
+function getAccById(id){return ST.accounts.find(a=>a.id===id)||null;}
+function getActiveAcc(){const p=ga();return p?getAccById(p.accountId)||null:null;}
+function getActiveBoardList(){const a=getActiveAcc();return a?a.boards:[];}
 
 // ─── UTILS ───────────────────────────────────────────────────
-function toast(msg,type='ok') {
-  const d=document.createElement('div'); d.className='toast '+type; d.textContent=msg;
-  document.getElementById('toast-area').appendChild(d);
-  setTimeout(()=>d.remove(),4000);
-}
-function tvk(id,btn) { const i=document.getElementById(id); i.type=i.type==='password'?'text':'password'; btn.textContent=i.type==='password'?'Show':'Hide'; }
-function showTab(name,btn) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  btn.classList.add('active');
-  ({pins:renderPins,export:buildExport,projects:renderProjs,urls:renderUrls,accounts:renderAccounts,images:renderImgBank,schedule:updateSchedUI}[name]||(() => {}))();
-}
-function upStats() {
-  const p=ga(),acc=getActiveAcc();
-  document.getElementById('s-urls').textContent=p?p.urls.length:0;
-  document.getElementById('s-pins').textContent=p?p.pins.filter(x=>x.title).length:0;
-  document.getElementById('s-imgs').textContent=p?p.pins.filter(x=>x.imageUrl).length:0;
-  document.getElementById('s-acc').textContent=acc?acc.name:'—';
-  const b=document.getElementById('apb');
-  if(p){b.classList.add('show');document.getElementById('apn').textContent=p.name;}
-  else b.classList.remove('show');
-}
+function toast(msg,type='ok'){const d=document.createElement('div');d.className='toast '+type;d.textContent=msg;document.getElementById('toast-area').appendChild(d);setTimeout(()=>d.remove(),4000);}
+function tvk(id,btn){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'Show':'Hide';}
+function showTab(name,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');({pins:renderPins,export:buildExport,projects:renderProjs,urls:renderUrls,accounts:renderAccounts,images:renderImgBank,schedule:updateSchedUI}[name]||(() => {}))();}
+function upStats(){const p=ga(),acc=getActiveAcc();document.getElementById('s-urls').textContent=p?p.urls.length:0;document.getElementById('s-pins').textContent=p?p.pins.filter(x=>x.title).length:0;document.getElementById('s-imgs').textContent=p?p.pins.filter(x=>x.imageUrl).length:0;document.getElementById('s-acc').textContent=acc?acc.name:'—';const b=document.getElementById('apb');if(p){b.classList.add('show');document.getElementById('apn').textContent=p.name;}else b.classList.remove('show');}
 
 // ═══════════════════════════════════════════════════════════════
-// PROMPT BUILDER
+// EXTENSION INTEGRATION
 // ═══════════════════════════════════════════════════════════════
-function buildPrompt(url, existingTitle) {
-  const parts = url.split('/').filter(Boolean);
-  const slug = (parts.pop()||parts.pop()||'').replace(/[-_]/g,' ').replace(/\.\w+$/,'').trim();
-  const domain = (url.split('/')[2]||'').replace('www.','');
-  const boards = getActiveBoardList();
-  const boardsInstruction = boards.length
-    ? 'BOARD LIST — pick the best match:\n'+boards.map(b=>'- '+b).join('\n')
-    : '';
-  const boardInstruction = boards.length
-    ? 'Choose the best match from the board list, or suggest one if none fit exactly.'
-    : 'Suggest a specific relevant Pinterest board name.';
-  const varNote = existingTitle
-    ? '\n⚠ VARIATION MODE: Previous title was "'+existingTitle+'". Write a completely different angle.\n'
-    : '';
-  let prompt = (ST.s.masterPrompt||DEFAULT_PROMPT);
-  prompt = prompt
-    .replace(/\{url\}/g, url)
-    .replace(/\{slug\}/g, slug||'this topic')
-    .replace(/\{domain\}/g, domain)
-    .replace(/\{boards_instruction\}/g, boardsInstruction)
-    .replace(/\{board_instruction\}/g, boardInstruction);
-  return varNote + prompt;
-}
+const WEBAPP_ORIGIN = location.origin;
 
-// ─── PARSE AI RESPONSE ───────────────────────────────────────
-function parseAI(text) {
-  if(!text?.trim()) return {error:'Empty response'};
-  const clean = text.replace(/```json|```/gi,'').trim();
-  try { return validate(JSON.parse(clean)); } catch{}
-  const m = clean.match(/\{[\s\S]*\}/);
-  if(m) { try { return validate(JSON.parse(m[0])); } catch{} }
-  return {error:'No valid JSON found. Copy the full AI response including { } braces.'};
-}
-function validate(d) {
-  if(!d.title) return {error:'Missing "title" in JSON'};
-  if(!d.description) return {error:'Missing "description" in JSON'};
-  if(d.tags?.length>5) d.tags=d.tags.slice(0,5);
-  return d;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// RELAY WINDOW FLOW — like the Chrome extension
-// ═══════════════════════════════════════════════════════════════
-function openRelayForUrl(urlId, onResult, onSkip) {
-  const p = ga(); if(!p) return;
-  const ue = p.urls.find(u=>u.id===urlId); if(!ue) return;
-  const pin = p.pins.find(x=>x.urlId===urlId)||{};
-  const prompt = buildPrompt(ue.url, pin.title||'');
-
-  // Close any existing relay window
-  if(ST._relayWin && !ST._relayWin.closed) ST._relayWin.close();
-  // Remove old listener
-  if(ST._bcListener) { ST._bc?.removeEventListener('message', ST._bcListener); ST._bc?.close(); }
-
-  // Build relay URL
-  const relayUrl = '/relay.html?'
-    + 'ch='+encodeURIComponent(BC_CHANNEL)
-    + '&id='+encodeURIComponent(String(urlId))
-    + '&url='+encodeURIComponent(ue.url)
-    + '&prompt='+encodeURIComponent(prompt);
-
-  // Open popup-style window
-  const w=700, h=620;
-  const left=Math.round(window.screenX + (window.outerWidth-w)/2);
-  const top=Math.round(window.screenY + (window.outerHeight-h)/2);
-  ST._relayWin = window.open(relayUrl,'pinforge_relay',
-    `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
-
-  if(!ST._relayWin) {
-    // Popup blocked — fallback
-    toast('Popup blocked! Allow popups for this site in your browser settings.','err');
-    return;
+async function checkExtension(){
+  try{
+    const r=await fetch('/api/jobs?action=ping');
+    const d=await r.json();
+    const connected=d.pinforge===true;
+    ST._extConnected=connected;
+    setExtStatus(connected?'connected':'disconnected',connected?`Extension ready — ${d.pending||0} jobs pending`:'Extension not connected — install PinForge Extension');
+  }catch{
+    ST._extConnected=false;
+    setExtStatus('disconnected','Could not reach job API');
   }
-
-  // Listen for result via BroadcastChannel
-  ST._bc = new BroadcastChannel(BC_CHANNEL);
-  ST._bcListener = (evt) => {
-    if(evt.data?.urlId !== String(urlId)) return;
-    ST._bc.removeEventListener('message', ST._bcListener);
-    ST._bc.close();
-    if(evt.data.type === 'pin_result') {
-      onResult(evt.data.data);
-    } else if(evt.data.type === 'pin_skip') {
-      onSkip?.();
-    }
-  };
-  ST._bc.addEventListener('message', ST._bcListener);
 }
 
-// ─── SINGLE PIN GENERATE ────────────────────────────────────
-function openGenModal(urlId) {
-  const p = ga(); if(!p) return;
-  const pin = p.pins.find(x=>x.urlId===urlId)||{};
-  openRelayForUrl(urlId,
-    (data) => {
-      updPin(urlId, {title:data.title, description:data.description, tags:(data.tags||[]).slice(0,5), board:pin.board||data.board||''});
-      sv(); upStats(); renderPins(); renderUrls();
-      toast('Pin generated successfully!');
-    },
-    () => toast('Pin skipped','warn')
-  );
+function setExtStatus(state,text){
+  ['ext-dot','pins-ext-dot'].forEach(id=>{const el=document.getElementById(id);if(el){el.className='ext-dot '+state;}});
+  ['ext-status-text','pins-ext-text'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=text;});
 }
 
-// ─── BATCH GENERATE ─────────────────────────────────────────
-function genAllFlow() {
-  const p = ga();
-  if(!p||!p.urls.length){toast('Add URLs first','err');return;}
-  ST._batchQueue = p.urls.map(u=>u.id);
-  ST._batchIdx = 0;
-  ST._batchRunning = true;
-  document.getElementById('batch-panel').style.display = 'block';
-  document.getElementById('ga-btn').disabled = true;
-  renderBatchList();
-  runNextBatch();
+// ─── PROMPT BUILDER ──────────────────────────────────────────
+function buildPrompt(url,existingTitle){
+  const parts=url.split('/').filter(Boolean);
+  const slug=(parts.pop()||parts.pop()||'').replace(/[-_]/g,' ').replace(/\.\w+$/,'').trim();
+  const domain=(url.split('/')[2]||'').replace('www.','');
+  const boards=getActiveBoardList();
+  const boardsInstruction=boards.length?'BOARD LIST — pick best match:\n'+boards.map(b=>'- '+b).join('\n'):'';
+  const boardInstruction=boards.length?'Choose best match from the board list, or suggest one if none fit.':'Suggest a specific relevant Pinterest board name.';
+  const varNote=existingTitle?'\n⚠ VARIATION MODE: Previous title was "'+existingTitle+'". Write a completely different angle.\n':'';
+  let prompt=(ST.s.masterPrompt||DEFAULT_PROMPT);
+  prompt=prompt.replace(/\{url\}/g,url).replace(/\{slug\}/g,slug||'this topic').replace(/\{domain\}/g,domain).replace(/\{boards_instruction\}/g,boardsInstruction).replace(/\{board_instruction\}/g,boardInstruction);
+  return varNote+prompt;
 }
-function cancelBatch() {
-  ST._batchRunning = false;
-  if(ST._relayWin && !ST._relayWin.closed) ST._relayWin.close();
-  if(ST._bc) { ST._bc.close(); }
-  document.getElementById('batch-panel').style.display = 'none';
-  document.getElementById('ga-btn').disabled = false;
+
+// ─── BATCH GENERATE (via extension) ─────────────────────────
+async function genAllExt(){
+  const p=ga();if(!p||!p.urls.length){toast('Add URLs first','err');return;}
+  const pending=p.urls.filter(u=>{const pin=p.pins.find(x=>x.urlId===u.id);return !pin||!pin.title;});
+  if(!pending.length){toast('All pins already generated!','warn');return;}
+
+  // Check extension is connected
+  await checkExtension();
+  if(!ST._extConnected){toast('Extension not connected — install PinForge Extension and connect it to this webapp URL','err');return;}
+
+  // Enqueue jobs
+  const jobs=pending.map(u=>{
+    const pin=p.pins.find(x=>x.urlId===u.id)||{};
+    return{id:String(u.id),url:u.url,prompt:buildPrompt(u.url,pin.title||''),provider:ST.s.defProvider||'claude'};
+  });
+
+  const r=await fetch('/api/jobs?action=enqueue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobs})});
+  if(!r.ok){toast('Failed to enqueue jobs','err');return;}
+  const d=await r.json();
+  toast(`⚡ ${d.added} jobs queued — extension is processing…`);
+
+  // Start polling for results
+  ST._batchRunning=true;
+  ST._batchQueue=pending.map(u=>String(u.id));
+  document.getElementById('batch-panel').style.display='block';
+  document.getElementById('ga-btn').disabled=true;
+  renderBatchList(pending);
+  pollResults();
+}
+
+function cancelBatch(){
+  ST._batchRunning=false;
+  clearTimeout(ST._pollTimer);
+  document.getElementById('batch-panel').style.display='none';
+  document.getElementById('ga-btn').disabled=false;
   toast('Batch cancelled','warn');
 }
-function renderBatchList() {
-  const p = ga(); if(!p) return;
-  document.getElementById('batch-url-list').innerHTML = p.urls.map(u=>{
-    const pin = p.pins.find(x=>x.urlId===u.id)||{};
-    const status = pin.title ? 'done' : 'pending';
-    return `<div class="url-gen-row" id="brow-${u.id}">
-      <span class="url-chip" title="${u.url}">${u.url}</span>
-      <span class="gen-pill ${status}" id="bpill-${u.id}">${pin.title?'Done':'Pending'}</span>
-    </div>`;
-  }).join('');
-}
-function runNextBatch() {
-  if(!ST._batchRunning) return;
-  const p = ga();
-  const total = ST._batchQueue.length;
-  const done = p ? ST._batchQueue.filter(uid=>{ const pin=p.pins.find(x=>x.urlId===uid); return pin&&pin.title; }).length : 0;
-  document.getElementById('batch-bar').style.width = (total?Math.round(done/total*100):0)+'%';
-  document.getElementById('batch-count-text').textContent = done+' / '+total;
 
-  if(ST._batchIdx >= total) {
-    document.getElementById('batch-status-text').textContent = '✓ All done!';
-    document.getElementById('batch-bar').style.width = '100%';
-    document.getElementById('ga-btn').disabled = false;
-    ST._batchRunning = false;
-    toast('All '+done+' pins generated!');
-    return;
-  }
+async function pollResults(){
+  if(!ST._batchRunning)return;
+  const p=ga();if(!p)return;
 
-  const urlId = ST._batchQueue[ST._batchIdx];
-  const ue = p?.urls.find(u=>u.id===urlId);
-  if(!ue) { ST._batchIdx++; runNextBatch(); return; }
+  try{
+    const r=await fetch('/api/jobs?action=results');
+    const d=await r.json();
+    const results=d.results||[];
 
-  // Mark current
-  const pill = document.getElementById('bpill-'+urlId);
-  if(pill){ pill.textContent='Waiting...'; pill.className='gen-pill generating'; }
-  document.getElementById('batch-status-text').textContent = 'Generating '+(ST._batchIdx+1)+' of '+total+': '+ue.url.substring(0,50)+'...';
+    // Apply any done results
+    let anyNew=false;
+    const idsToAck=[];
 
-  openRelayForUrl(urlId,
-    (data) => {
-      if(!ST._batchRunning) return;
-      const pin = p.pins.find(x=>x.urlId===urlId)||{};
-      updPin(urlId, {title:data.title, description:data.description, tags:(data.tags||[]).slice(0,5), board:pin.board||data.board||''});
-      // Mark done
-      const dp = document.getElementById('bpill-'+urlId);
-      if(dp){ dp.textContent='Done'; dp.className='gen-pill done'; }
-      sv(); upStats(); renderPins();
-      ST._batchIdx++;
-      runNextBatch();
-    },
-    () => {
-      // Skipped
-      const sp = document.getElementById('bpill-'+urlId);
-      if(sp){ sp.textContent='Skipped'; sp.className='gen-pill skipped'; }
-      ST._batchIdx++;
-      runNextBatch();
+    for(const res of results){
+      const urlId=parseFloat(res.id)||res.id;
+      const url_entry=p.urls.find(u=>String(u.id)===String(res.id));
+      if(!url_entry)continue;
+      const pin=p.pins.find(x=>x.urlId===url_entry.id);
+      if(!pin)continue;
+      if(pin.title)continue; // already done
+
+      if(res.status==='done'&&res.result){
+        updPin(url_entry.id,{title:res.result.title,description:res.result.description,tags:(res.result.tags||[]).slice(0,5),board:pin.board||res.result.board||''});
+        const pill=document.getElementById('bpill-'+url_entry.id);
+        if(pill){pill.textContent='Done';pill.className='gen-pill done';}
+        anyNew=true;
+        idsToAck.push(String(url_entry.id));
+      }else if(res.status==='error'){
+        const pill=document.getElementById('bpill-'+url_entry.id);
+        if(pill){pill.textContent='Error';pill.className='gen-pill error';}
+        idsToAck.push(String(url_entry.id));
+      }
     }
-  );
+
+    // Also check queue for working status
+    const qr=await fetch('/api/jobs?action=queue');
+    const qd=await qr.json();
+    const queue=qd.jobs||[];
+    for(const job of queue){
+      const url_entry=p.urls.find(u=>String(u.id)===job.id);
+      if(!url_entry)continue;
+      const pill=document.getElementById('bpill-'+url_entry.id);
+      if(pill&&job.status==='working'&&pill.textContent!=='Done'){
+        pill.textContent='⚡ Working';pill.className='gen-pill working';
+      }
+    }
+
+    if(anyNew){
+      sv();upStats();renderPins();
+      // Ack done jobs
+      await fetch('/api/jobs?action=clear',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids:idsToAck})});
+    }
+
+    // Update progress
+    const done=p.pins.filter(x=>x.title).length;
+    const total=p.urls.length;
+    document.getElementById('batch-bar').style.width=Math.round(done/total*100)+'%';
+    document.getElementById('batch-count-text').textContent=done+' / '+total;
+
+    if(done>=total){
+      document.getElementById('batch-status-text').textContent='✓ All done!';
+      document.getElementById('batch-bar').style.width='100%';
+      ST._batchRunning=false;
+      document.getElementById('ga-btn').disabled=false;
+      toast('All '+done+' pins generated!');
+      return;
+    }
+
+    const working=queue.find(j=>j.status==='working');
+    if(working){
+      document.getElementById('batch-status-text').textContent='⚡ Extension working on: '+working.url.substring(0,50)+'…';
+    }else{
+      document.getElementById('batch-status-text').textContent=`Done ${done}/${total} — extension processing…`;
+    }
+
+  }catch(e){console.warn('poll error',e);}
+
+  ST._pollTimer=setTimeout(pollResults,2500);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// IMAGE UPLOAD
-// ═══════════════════════════════════════════════════════════════
-async function uploadFile(file) {
-  const sp = ST.s.storProv; if(sp==='none') return null;
-  const b64 = await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
-  try {
-    let body = {imageBase64:b64, fileName:file.name, mimeType:file.type};
-
-    if(sp==='bunny') {
-      if(!ST.s.bunnyZone||!ST.s.bunnyKey||!ST.s.bunnyCdn){toast('Fill in Bunny.net settings first','err');return null;}
-      Object.assign(body,{provider:'bunny',bunnyStorageZone:ST.s.bunnyZone,bunnyAccessKey:ST.s.bunnyKey,
-        bunnyStorageRegion:ST.s.bunnyRegion||'',bunnyCdnHostname:ST.s.bunnyCdn,bunnyFolder:ST.s.bunnyFolder||'pinforge'});
-    } else if(sp==='cloudinary') {
-      if(!ST.s.cldCloud||!ST.s.cldPreset){toast('Fill in Cloudinary settings first','err');return null;}
-      Object.assign(body,{provider:'cloudinary',cloudName:ST.s.cldCloud,uploadPreset:ST.s.cldPreset});
-    } else if(sp==='imgbb') {
-      if(!ST.s.imgbbKey){toast('Fill in ImgBB key first','err');return null;}
-      Object.assign(body,{provider:'imgbb',imgbbKey:ST.s.imgbbKey});
-    } else return null;
-
-    const r = await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d = await r.json();
-    if(d.url) return d.url;
-    throw new Error(d.error||'Upload failed');
-  } catch(e){toast('Upload error: '+e.message,'err');return null;}
-}
-
-async function testBunny() {
-  const msg=document.getElementById('bunny-msg'); msg.textContent='Testing...';msg.style.color='#6b7280';
-  const {bunnyZone,bunnyKey,bunnyCdn}=ST.s;
-  if(!bunnyZone||!bunnyKey||!bunnyCdn){msg.textContent='Fill in Zone Name, AccessKey and CDN Hostname first';msg.style.color='#dc2626';return;}
-  const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
-  try {
-    const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      provider:'bunny',bunnyStorageZone:bunnyZone,bunnyAccessKey:bunnyKey,
-      bunnyStorageRegion:ST.s.bunnyRegion||'',bunnyCdnHostname:bunnyCdn,bunnyFolder:ST.s.bunnyFolder||'pinforge',
-      imageBase64:b64,fileName:'test.png',mimeType:'image/png'
-    })});
-    const d=await r.json();
-    if(d.url){msg.textContent='✓ Bunny works! URL: '+d.url.substring(0,60)+'...';msg.style.color='#059669';toast('Bunny.net connected!');}
-    else throw new Error(d.error||'No URL returned');
-  } catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';toast('Bunny test failed: '+e.message,'err');}
-}
-async function testCloudinary() {
-  const msg=document.getElementById('cld-msg'); msg.textContent='Testing...';msg.style.color='#6b7280';
-  if(!ST.s.cldCloud||!ST.s.cldPreset){msg.textContent='Enter Cloud Name and Preset first';msg.style.color='#dc2626';return;}
-  const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
-  try {
-    const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:'cloudinary',cloudName:ST.s.cldCloud,uploadPreset:ST.s.cldPreset,imageBase64:b64,fileName:'test.png',mimeType:'image/png'})});
-    const d=await r.json();
-    if(d.url){msg.textContent='✓ Cloudinary works!';msg.style.color='#059669';toast('Cloudinary connected!');}
-    else throw new Error(d.error||'No URL');
-  } catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';}
-}
-async function testImgBB() {
-  const msg=document.getElementById('ibb-msg'); msg.textContent='Testing...';msg.style.color='#6b7280';
-  if(!ST.s.imgbbKey){msg.textContent='Enter ImgBB key first';msg.style.color='#dc2626';return;}
-  const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
-  try {
-    const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:'imgbb',imgbbKey:ST.s.imgbbKey,imageBase64:b64,fileName:'test.png'})});
-    const d=await r.json();
-    if(d.url){msg.textContent='✓ ImgBB works!';msg.style.color='#059669';toast('ImgBB connected!');}
-    else throw new Error(d.error||'No URL');
-  } catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';}
+function renderBatchList(urls){
+  document.getElementById('batch-url-list').innerHTML=urls.map(u=>`<div class="url-gen-row" id="brow-${u.id}"><span class="url-chip" title="${u.url}">${u.url}</span><span class="gen-pill pending" id="bpill-${u.id}">Queued</span></div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
 // SETTINGS
 // ═══════════════════════════════════════════════════════════════
-function selDefProv(p,btn) {
-  ST.s.defProvider=p; sv();
-  document.querySelectorAll('#def-prov-btns .prov-pill').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-function selStor(p) {
-  ST.s.storProv=p; sv();
-  ['none','bunny','cloudinary','imgbb'].forEach(s=>{const b=document.getElementById('st-'+s);if(b){b.classList.remove('sel');if(s===p)b.classList.add('sel');}});
-  const notes={none:'Images stay local (no public URL in CSV).',bunny:'Images upload to Bunny.net CDN — fast global delivery.',cloudinary:'Images upload to Cloudinary.',imgbb:'Images upload to ImgBB.'};
-  document.getElementById('stor-note').textContent=notes[p]||'';
-}
-function resetMasterPrompt() {
-  document.getElementById('master-prompt').value=DEFAULT_PROMPT;
-  ST.s.masterPrompt=DEFAULT_PROMPT; sv();
-  toast('Master prompt reset');
-}
-function saveAllSettings() {
-  ST.s.masterPrompt=document.getElementById('master-prompt').value||DEFAULT_PROMPT;
-  ST.s.bunnyZone=document.getElementById('bunny-zone').value||'';
-  ST.s.bunnyKey=document.getElementById('bunny-key').value||'';
-  ST.s.bunnyRegion=document.getElementById('bunny-region').value||'';
-  ST.s.bunnyCdn=document.getElementById('bunny-cdn').value||'';
-  ST.s.bunnyFolder=document.getElementById('bunny-folder').value||'pinforge';
-  ST.s.cldCloud=document.getElementById('cld-cloud').value||'';
-  ST.s.cldPreset=document.getElementById('cld-preset').value||'';
-  ST.s.imgbbKey=document.getElementById('ibb-key').value||'';
-  sv(); toast('Settings saved!');
-  document.getElementById('mp-saved').textContent='Saved ✓';
-  setTimeout(()=>document.getElementById('mp-saved').textContent='',2000);
-}
+function selDefProv(p,btn){ST.s.defProvider=p;sv();document.querySelectorAll('#def-prov-btns .prov-pill').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');}
+function selStor(p){ST.s.storProv=p;sv();['none','bunny','cloudinary','imgbb'].forEach(s=>{const b=document.getElementById('st-'+s);if(b){b.classList.remove('sel');if(s===p)b.classList.add('sel');}});const notes={none:'Local only — no public URL in CSV.',bunny:'Bunny.net CDN — fast global delivery.',cloudinary:'Cloudinary CDN.',imgbb:'ImgBB free hosting.'};document.getElementById('stor-note').textContent=notes[p]||'';}
+function resetMasterPrompt(){document.getElementById('master-prompt').value=DEFAULT_PROMPT;ST.s.masterPrompt=DEFAULT_PROMPT;sv();toast('Master prompt reset');}
+function saveAllSettings(){ST.s.masterPrompt=document.getElementById('master-prompt').value||DEFAULT_PROMPT;ST.s.bunnyZone=document.getElementById('bunny-zone').value||'';ST.s.bunnyKey=document.getElementById('bunny-key').value||'';ST.s.bunnyRegion=document.getElementById('bunny-region').value||'';ST.s.bunnyCdn=document.getElementById('bunny-cdn').value||'';ST.s.bunnyFolder=document.getElementById('bunny-folder').value||'pinforge';ST.s.cldCloud=document.getElementById('cld-cloud').value||'';ST.s.cldPreset=document.getElementById('cld-preset').value||'';ST.s.imgbbKey=document.getElementById('ibb-key').value||'';sv();toast('Settings saved!');}
+
+// Image upload helpers
+async function uploadFile(file){const sp=ST.s.storProv;if(sp==='none')return null;const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});try{let body={imageBase64:b64,fileName:file.name,mimeType:file.type};if(sp==='bunny'){if(!ST.s.bunnyZone||!ST.s.bunnyKey||!ST.s.bunnyCdn){toast('Fill Bunny settings first','err');return null;}Object.assign(body,{provider:'bunny',bunnyStorageZone:ST.s.bunnyZone,bunnyAccessKey:ST.s.bunnyKey,bunnyStorageRegion:ST.s.bunnyRegion||'',bunnyCdnHostname:ST.s.bunnyCdn,bunnyFolder:ST.s.bunnyFolder||'pinforge'});}else if(sp==='cloudinary'){if(!ST.s.cldCloud||!ST.s.cldPreset){toast('Fill Cloudinary settings','err');return null;}Object.assign(body,{provider:'cloudinary',cloudName:ST.s.cldCloud,uploadPreset:ST.s.cldPreset});}else if(sp==='imgbb'){if(!ST.s.imgbbKey){toast('Fill ImgBB key','err');return null;}Object.assign(body,{provider:'imgbb',imgbbKey:ST.s.imgbbKey});}const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(d.url)return d.url;throw new Error(d.error||'Upload failed');}catch(e){toast('Upload error: '+e.message,'err');return null;}}
+async function testBunny(){const msg=document.getElementById('bunny-msg');msg.textContent='Testing…';msg.style.color='#6b7280';const{bunnyZone,bunnyKey,bunnyCdn}=ST.s;if(!bunnyZone||!bunnyKey||!bunnyCdn){msg.textContent='Fill Zone Name, AccessKey and CDN Hostname first';msg.style.color='#dc2626';return;}const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';try{const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:'bunny',bunnyStorageZone:bunnyZone,bunnyAccessKey:bunnyKey,bunnyStorageRegion:ST.s.bunnyRegion||'',bunnyCdnHostname:bunnyCdn,bunnyFolder:ST.s.bunnyFolder||'pinforge',imageBase64:b64,fileName:'test.png',mimeType:'image/png'})});const d=await r.json();if(d.url){msg.textContent='✓ Bunny works! '+d.url.substring(0,50)+'…';msg.style.color='#059669';toast('Bunny.net connected!');}else throw new Error(d.error||'No URL');}catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';}}
+async function testCloudinary(){const msg=document.getElementById('cld-msg');msg.textContent='Testing…';if(!ST.s.cldCloud||!ST.s.cldPreset){msg.textContent='Fill Cloud Name and Preset';msg.style.color='#dc2626';return;}const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';try{const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:'cloudinary',cloudName:ST.s.cldCloud,uploadPreset:ST.s.cldPreset,imageBase64:b64,fileName:'test.png',mimeType:'image/png'})});const d=await r.json();if(d.url){msg.textContent='✓ Works!';msg.style.color='#059669';}else throw new Error(d.error);}catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';}}
+async function testImgBB(){const msg=document.getElementById('ibb-msg');msg.textContent='Testing…';if(!ST.s.imgbbKey){msg.textContent='Enter ImgBB key';msg.style.color='#dc2626';return;}const b64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';try{const r=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:'imgbb',imgbbKey:ST.s.imgbbKey,imageBase64:b64,fileName:'test.png'})});const d=await r.json();if(d.success||d.url){msg.textContent='✓ Works!';msg.style.color='#059669';}else throw new Error(d.error);}catch(e){msg.textContent='Failed: '+e.message;msg.style.color='#dc2626';}}
 
 // ═══════════════════════════════════════════════════════════════
 // ACCOUNTS
@@ -865,21 +654,12 @@ function cancelAddAcc(){document.getElementById('add-acc-form').style.display='n
 function addNewAccBoard(){const n=document.getElementById('new-acc-board-inp').value.trim();if(!n)return;if(!ST._newBoards.includes(n))ST._newBoards.push(n);document.getElementById('new-acc-board-inp').value='';renderNewAccBoards();}
 function removeNewAccBoard(n){ST._newBoards=ST._newBoards.filter(b=>b!==n);renderNewAccBoards();}
 function renderNewAccBoards(){const el=document.getElementById('new-acc-boards'),empty=document.getElementById('new-acc-boards-empty');if(!ST._newBoards.length){el.innerHTML='';el.appendChild(empty);empty.style.display='';return;}empty.style.display='none';el.innerHTML=ST._newBoards.map(b=>`<span class="board-tag">📌 ${b}<span class="bx" onclick="removeNewAccBoard('${b.replace(/'/g,"\\'")}')">×</span></span>`).join('');}
-function saveNewAcc(){const name=document.getElementById('acc-name-inp').value.trim();if(!name){toast('Enter account name','err');return;}const acc={id:Date.now().toString(),name,url:document.getElementById('acc-url-inp').value.trim(),boards:[...ST._newBoards],createdAt:new Date().toISOString()};ST.accounts.push(acc);sv();cancelAddAcc();renderAccounts();upStats();toast('Account "'+name+'" saved with '+acc.boards.length+' boards');}
-function deleteAccount(id){const acc=getAccById(id);if(!acc||!confirm('Delete account "'+acc.name+'"?'))return;ST.accounts=ST.accounts.filter(a=>a.id!==id);ST.projects.forEach(p=>{if(p.accountId===id)p.accountId=null;});sv();renderAccounts();renderProjs();upStats();toast('Account deleted');}
-function addBoardToAcc(accId){const name=prompt('New board name:');if(!name?.trim())return;const acc=getAccById(accId);if(!acc)return;if(!acc.boards.includes(name.trim())){acc.boards.push(name.trim());sv();renderAccounts();renderPins();toast('Board added');}else toast('Board already exists','warn');}
+function saveNewAcc(){const name=document.getElementById('acc-name-inp').value.trim();if(!name){toast('Enter account name','err');return;}const acc={id:Date.now().toString(),name,url:document.getElementById('acc-url-inp').value.trim(),boards:[...ST._newBoards],createdAt:new Date().toISOString()};ST.accounts.push(acc);sv();cancelAddAcc();renderAccounts();upStats();toast('Account "'+name+'" saved');}
+function deleteAccount(id){const acc=getAccById(id);if(!acc||!confirm('Delete "'+acc.name+'"?'))return;ST.accounts=ST.accounts.filter(a=>a.id!==id);ST.projects.forEach(p=>{if(p.accountId===id)p.accountId=null;});sv();renderAccounts();renderProjs();upStats();}
+function addBoardToAcc(accId){const name=prompt('New board name:');if(!name?.trim())return;const acc=getAccById(accId);if(!acc)return;if(!acc.boards.includes(name.trim())){acc.boards.push(name.trim());sv();renderAccounts();renderPins();toast('Board added');}else toast('Already exists','warn');}
 function removeBoardFromAcc(accId,b){const acc=getAccById(accId);if(!acc)return;acc.boards=acc.boards.filter(x=>x!==b);sv();renderAccounts();renderPins();}
 function toggleAccBoards(id){const el=document.getElementById('acc-boards-'+id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
-function renderAccounts(){
-  const list=document.getElementById('acc-list'),empty=document.getElementById('acc-empty');
-  if(!ST.accounts.length){list.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  const usage={};ST.projects.forEach(p=>{if(p.accountId)usage[p.accountId]=(usage[p.accountId]||0)+1;});
-  list.innerHTML=ST.accounts.map(acc=>{
-    const u=usage[acc.id]||0,ini=acc.name.replace('@','').substring(0,2).toUpperCase();
-    return`<div class="acc-card"><div class="acc-head"><div class="acc-avatar">${ini}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">${acc.name}</div><div style="font-size:12px;color:#6b7280">${acc.boards.length} boards${u?' · Used in '+u+' project'+(u>1?'s':''):''}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn sm" onclick="toggleAccBoards('${acc.id}')">▼ Boards</button><button class="btn sm pr" onclick="addBoardToAcc('${acc.id}')">+ Board</button><button class="btn sm danger" onclick="deleteAccount('${acc.id}')">Delete</button></div></div><div class="acc-boards" id="acc-boards-${acc.id}" style="display:none"><div style="font-size:12px;color:#6b7280;margin-bottom:8px">Click × to remove</div>${acc.boards.length?acc.boards.map(b=>`<span class="board-tag">📌 ${b}<span class="bx" onclick="removeBoardFromAcc('${acc.id}','${b.replace(/'/g,"\\'")}')">×</span></span>`).join(''):'<span style="font-size:12px;color:#9ca3af">No boards yet</span>'}</div></div>`;
-  }).join('');
-}
+function renderAccounts(){const list=document.getElementById('acc-list'),empty=document.getElementById('acc-empty');if(!ST.accounts.length){list.innerHTML='';empty.style.display='block';return;}empty.style.display='none';const usage={};ST.projects.forEach(p=>{if(p.accountId)usage[p.accountId]=(usage[p.accountId]||0)+1;});list.innerHTML=ST.accounts.map(acc=>{const u=usage[acc.id]||0,ini=acc.name.replace('@','').substring(0,2).toUpperCase();return`<div class="acc-card"><div class="acc-head"><div class="acc-avatar">${ini}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">${acc.name}</div><div style="font-size:12px;color:#6b7280">${acc.boards.length} boards${u?' · '+u+' project'+(u>1?'s':''):''}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn sm" onclick="toggleAccBoards('${acc.id}')">▼ Boards</button><button class="btn sm pr" onclick="addBoardToAcc('${acc.id}')">+ Board</button><button class="btn sm danger" onclick="deleteAccount('${acc.id}')">Delete</button></div></div><div class="acc-boards" id="acc-boards-${acc.id}" style="display:none">${acc.boards.length?acc.boards.map(b=>`<span class="board-tag">📌 ${b}<span class="bx" onclick="removeBoardFromAcc('${acc.id}','${b.replace(/'/g,"\\'")}')">×</span></span>`).join(''):'<span style="font-size:12px;color:#9ca3af">No boards</span>'}</div></div>`;}).join('');}
 
 // ═══════════════════════════════════════════════════════════════
 // PROJECTS
@@ -887,30 +667,17 @@ function renderAccounts(){
 function mkProj(name){return{id:Date.now().toString(),name,status:'draft',accountId:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),urls:[],pins:[],scheduleRows:[],notes:''};}
 function showNPF(){const f=document.getElementById('np-form');f.style.display=f.style.display==='none'?'block':'none';if(f.style.display==='block')document.getElementById('np-name').focus();}
 function createProj(){const name=document.getElementById('np-name').value.trim()||'Project '+(ST.projects.length+1);const p=mkProj(name);ST.projects.push(p);ST.aid=p.id;sv();document.getElementById('np-name').value='';document.getElementById('np-form').style.display='none';toast('Project "'+name+'" created');renderProjs();upStats();}
-function assignAccToProj(projId,accId){const p=ST.projects.find(x=>x.id===projId);if(!p)return;p.accountId=accId||null;sv();renderProjs();upStats();renderPins();const acc=getAccById(accId);if(acc)toast('Assigned: '+acc.name+' ('+acc.boards.length+' boards)');}
-function renderProjs(){
-  const list=document.getElementById('proj-list'),empty=document.getElementById('proj-empty');
-  if(!ST.projects.length){list.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  list.innerHTML=ST.projects.map(p=>{
-    const pins=p.pins.filter(x=>x.title).length,imgs=p.pins.filter(x=>x.imageUrl).length,pct=pins>0?Math.round(imgs/pins*100):0,isAct=p.id===ST.aid;
-    const acc=getAccById(p.accountId);
-    return`<div class="proj-card ${isAct?'act':''}" onclick="selProj('${p.id}')"><div class="pb"><div class="pi">${p.status==='exported'?'✅':p.status==='ready'?'🚀':'📝'}</div><div class="pinfo"><div class="pname">${p.name}${isAct?' <span style="font-size:11px;background:#E60023;color:#fff;padding:1px 8px;border-radius:99px;margin-left:6px">Active</span>':''}</div><div class="pmeta">${acc?`<span style="color:#E60023;font-weight:500">👤 ${acc.name}</span> · `:'<span style="color:#d97706">⚠ No account · </span>'}${p.urls.length} URLs · ${pins} pins</div></div><div style="display:flex;gap:6px;flex-shrink:0" onclick="event.stopPropagation()"><select onchange="chgSt('${p.id}',this.value)" style="font-size:11px;padding:3px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;cursor:pointer;width:auto"><option value="draft" ${p.status==='draft'?'selected':''}>Draft</option><option value="ready" ${p.status==='ready'?'selected':''}>Ready</option><option value="exported" ${p.status==='exported'?'selected':''}>Exported</option></select><button class="btn sm danger" onclick="delProj('${p.id}');event.stopPropagation()">✕</button></div></div><div style="padding:4px 16px 12px;border-top:1px solid #f3f4f6;display:flex;align-items:center;gap:10px"><label style="font-size:12px;color:#6b7280;flex-shrink:0;margin:0">Account:</label><select style="font-size:12px;padding:4px 8px;flex:1;max-width:260px" onclick="event.stopPropagation()" onchange="assignAccToProj('${p.id}',this.value)"><option value="">— assign account —</option>${ST.accounts.map(a=>`<option value="${a.id}" ${p.accountId===a.id?'selected':''}>${a.name} (${a.boards.length} boards)</option>`).join('')}</select>${acc?`<span style="font-size:11px;color:#059669">✓ ${acc.boards.length} boards</span>`:'<span style="font-size:11px;color:#9ca3af">No boards</span>'}</div>${pins>0?`<div class="ppb"><div style="display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-bottom:3px"><span>Images ${imgs}/${pins}</span><span>${pct}%</span></div><div class="ppbar"><div class="ppfill" style="width:${pct}%;background:${pct===100?'#059669':'#E60023'}"></div></div></div>`:''}</div>`;
-  }).join('');
-}
+function assignAccToProj(projId,accId){const p=ST.projects.find(x=>x.id===projId);if(!p)return;p.accountId=accId||null;sv();renderProjs();upStats();renderPins();const acc=getAccById(accId);if(acc)toast('Assigned: '+acc.name);}
+function renderProjs(){const list=document.getElementById('proj-list'),empty=document.getElementById('proj-empty');if(!ST.projects.length){list.innerHTML='';empty.style.display='block';return;}empty.style.display='none';list.innerHTML=ST.projects.map(p=>{const pins=p.pins.filter(x=>x.title).length,imgs=p.pins.filter(x=>x.imageUrl).length,pct=pins>0?Math.round(imgs/pins*100):0,isAct=p.id===ST.aid;const acc=getAccById(p.accountId);return`<div class="proj-card ${isAct?'act':''}" onclick="selProj('${p.id}')"><div class="pb"><div class="pi">${p.status==='exported'?'✅':'📝'}</div><div class="pinfo"><div class="pname">${p.name}${isAct?' <span style="font-size:11px;background:#E60023;color:#fff;padding:1px 8px;border-radius:99px;margin-left:6px">Active</span>':''}</div><div class="pmeta">${acc?`<span style="color:#E60023;font-weight:500">👤 ${acc.name}</span> · `:'<span style="color:#d97706">⚠ No account · </span>'}${p.urls.length} URLs · ${pins} pins</div></div><div style="display:flex;gap:6px;flex-shrink:0" onclick="event.stopPropagation()"><select onchange="chgSt('${p.id}',this.value)" style="font-size:11px;padding:3px 8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;width:auto"><option value="draft" ${p.status==='draft'?'selected':''}>Draft</option><option value="ready" ${p.status==='ready'?'selected':''}>Ready</option><option value="exported" ${p.status==='exported'?'selected':''}>Exported</option></select><button class="btn sm danger" onclick="delProj('${p.id}');event.stopPropagation()">✕</button></div></div><div style="padding:4px 16px 12px;border-top:1px solid #f3f4f6;display:flex;align-items:center;gap:10px"><label style="font-size:12px;color:#6b7280;flex-shrink:0;margin:0">Account:</label><select style="font-size:12px;padding:4px 8px;flex:1;max-width:260px" onclick="event.stopPropagation()" onchange="assignAccToProj('${p.id}',this.value)"><option value="">— assign account —</option>${ST.accounts.map(a=>`<option value="${a.id}" ${p.accountId===a.id?'selected':''}>${a.name} (${a.boards.length} boards)</option>`).join('')}</select>${acc?`<span style="font-size:11px;color:#059669">✓ ${acc.boards.length} boards</span>`:'<span style="font-size:11px;color:#9ca3af">No boards</span>'}</div>${pins>0?`<div class="ppb"><div style="display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-bottom:3px"><span>Images ${imgs}/${pins}</span><span>${pct}%</span></div><div class="ppbar"><div class="ppfill" style="width:${pct}%;background:${pct===100?'#059669':'#E60023'}"></div></div></div>`:''}</div>`;}).join('');}
 function selProj(id){ST.aid=id;sv();renderProjs();upStats();toast('Project "'+ST.projects.find(p=>p.id===id)?.name+'" active');}
 function chgSt(id,s){const p=ST.projects.find(x=>x.id===id);if(p){p.status=s;sv();renderProjs();}}
-function delProj(id){if(!confirm('Delete this project?'))return;ST.projects=ST.projects.filter(p=>p.id!==id);if(ST.aid===id)ST.aid=ST.projects[0]?.id||null;sv();renderProjs();upStats();toast('Project deleted');}
+function delProj(id){if(!confirm('Delete this project?'))return;ST.projects=ST.projects.filter(p=>p.id!==id);if(ST.aid===id)ST.aid=ST.projects[0]?.id||null;sv();renderProjs();upStats();}
 
 // ─── URLS ─────────────────────────────────────────────────────
-function addUrl(){const inp=document.getElementById('url-inp'),url=inp.value.trim();if(!url.startsWith('http')){toast('Enter a URL starting with http','err');return;}const p=ga();if(!p){toast('Create a project first','err');return;}if(p.urls.find(u=>u.url===url)){toast('URL already added','err');return;}const e={id:Date.now()+Math.random(),url};p.urls.push(e);p.pins.push({urlId:e.id,title:'',description:'',tags:[],imageUrl:'',board:'',link:url});inp.value='';sv();renderUrls();upStats();toast('URL added');}
+function addUrl(){const inp=document.getElementById('url-inp'),url=inp.value.trim();if(!url.startsWith('http')){toast('Enter a URL starting with http','err');return;}const p=ga();if(!p){toast('Create a project first','err');return;}if(p.urls.find(u=>u.url===url)){toast('URL already added','warn');return;}const e={id:Date.now()+Math.random(),url};p.urls.push(e);p.pins.push({urlId:e.id,title:'',description:'',tags:[],imageUrl:'',board:'',link:url});inp.value='';sv();renderUrls();upStats();toast('URL added');}
 function addBulkUrls(){const lines=document.getElementById('bulk-inp').value.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('http'));const p=ga();if(!p){toast('Create a project first','err');return;}let n=0;lines.forEach(url=>{if(!p.urls.find(u=>u.url===url)){const e={id:Date.now()+Math.random(),url};p.urls.push(e);p.pins.push({urlId:e.id,title:'',description:'',tags:[],imageUrl:'',board:'',link:url});n++;}});document.getElementById('bulk-inp').value='';sv();renderUrls();renderPins();upStats();toast(n+' URLs added');}
 function rmUrl(id){const p=ga();if(!p)return;p.urls=p.urls.filter(u=>u.id!==id);p.pins=p.pins.filter(x=>x.urlId!==id);sv();renderUrls();renderPins();upStats();}
-function renderUrls(){
-  const p=ga(),c=document.getElementById('url-list');
-  if(!p||!p.urls.length){c.innerHTML='<div class="empty"><div class="ei">🔗</div><p>No URLs yet</p></div>';return;}
-  c.innerHTML='<div class="card"><div>'+p.urls.map((u,i)=>{const pin=p.pins.find(x=>x.urlId===u.id);return`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #f3f4f6"><span style="font-size:12px;color:#9ca3af;width:24px;flex-shrink:0;font-weight:600">${i+1}</span><span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.url}">${u.url}</span>${pin?.title?'<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:#d1fae5;color:#065f46;flex-shrink:0">✓ Pin</span>':''}<button class="btn sm danger" onclick="rmUrl(${u.id})">✕</button></div>`;}).join('')+'</div></div>';
-}
+function renderUrls(){const p=ga(),c=document.getElementById('url-list');if(!p||!p.urls.length){c.innerHTML='<div class="empty"><div class="ei">🔗</div><p>No URLs yet</p></div>';return;}c.innerHTML='<div class="card"><div>'+p.urls.map((u,i)=>{const pin=p.pins.find(x=>x.urlId===u.id);return`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #f3f4f6"><span style="font-size:12px;color:#9ca3af;width:24px;flex-shrink:0;font-weight:600">${i+1}</span><span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.url}">${u.url}</span>${pin?.title?'<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:#d1fae5;color:#065f46;flex-shrink:0">✓ Pin</span>':''}<button class="btn sm danger" onclick="rmUrl(${u.id})">✕</button></div>`;}).join('')+'</div></div>';}
 
 // ─── PINS ─────────────────────────────────────────────────────
 function updPin(uid,upd){const p=ga();if(!p)return;const pin=p.pins.find(x=>x.urlId===uid);if(!pin)return;Object.assign(pin,upd);sv();}
@@ -924,116 +691,58 @@ function renderPins(){
   if(!p||!p.urls.length){c.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
   const boards=getActiveBoardList(),acc=getActiveAcc();
-  const warn=!acc?'<div class="alert aw" style="margin-bottom:12px">⚠ No account assigned. Go to Projects tab → assign an account to see boards.</div>':'';
+  const warn=!acc?'<div class="alert aw" style="margin-bottom:12px">⚠ No account assigned — go to Projects tab to assign one.</div>':'';
   c.innerHTML=warn+p.urls.map(u=>{
     const pin=p.pins.find(x=>x.urlId===u.id)||{title:'',description:'',tags:[],imageUrl:'',board:''};
     const tc=(pin.tags||[]).length,has=pin.title||pin.description;
-    return`<div class="card"><div class="ch" style="font-size:12px;color:#6b7280;font-weight:400"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${u.url}</span><div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px"><button class="btn pr sm" onclick="openGenModal(${u.id})">✨ ${has?'Regenerate':'Generate'}</button></div></div><div class="cb"><div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start"><div class="img-slot" onclick="document.getElementById('fi${u.id}').click()">${pin.imageUrl?`<img src="${pin.imageUrl}" alt="">`:'<div>📷</div><div>Upload</div>'}</div><input type="file" id="fi${u.id}" accept="image/*" style="display:none" onchange="quickUpload(${u.id},this.files[0])"><div style="flex:1"><label>Title — <span style="color:${(pin.title||'').length>90?'#dc2626':'#9ca3af'}">${(pin.title||'').length}/100</span></label><textarea maxlength="100" rows="2" oninput="updPin(${u.id},{title:this.value})" style="min-height:52px">${pin.title||''}</textarea></div></div>${!has?`<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:8px;padding:10px 12px;text-align:center;margin-bottom:12px;font-size:13px;color:#7e22ce">Click <b>Generate</b> → popup opens → paste prompt into ChatGPT/Claude/Gemini → paste result back → auto-fills</div>`:''}
-<div class="mb"><label>Description — <span style="color:${(pin.description||'').length>480?'#dc2626':(pin.description||'').length>0&&(pin.description||'').length<150?'#d97706':'#059669'}">${(pin.description||'').length}/500</span></label><textarea maxlength="500" rows="3" oninput="updPin(${u.id},{description:this.value})">${pin.description||''}</textarea></div><div class="mb"><label>Tags — max 5 (${tc}/5)</label><div class="tag-area" onclick="this.querySelector('input')?.focus()">${(pin.tags||[]).map(t=>`<span class="tag">${t}<span class="tx" onclick="rmTag(${u.id},'${t.replace(/'/g,"\\'")}')">×</span></span>`).join('')}${tc<5?`<input type="text" placeholder="type, Enter to add..." onkeydown="if((event.key==='Enter'||event.key===',')&&this.value.trim()){event.preventDefault();const v=this.value.trim().replace(/^#/,'');const pp=ga()?.pins.find(x=>x.urlId===${u.id});if(pp&&!pp.tags.includes(v)&&pp.tags.length<5){pp.tags.push(v);sv();renderPins();}this.value=''}">`:''}</div></div><div><label>Board${acc?' — '+acc.name:"'s boards"}</label>${boards.length?`<div style="display:flex;flex-wrap:wrap;gap:0;margin-top:4px">${boards.map(b=>`<span class="board-chip ${pin.board===b?'sel':''}" onclick="updPin(${u.id},{board:'${b.replace(/'/g,"\\'")}'});this.closest('.cb').querySelectorAll('.board-chip').forEach(el=>el.classList.remove('sel'));this.classList.add('sel')">${b}</span>`).join('')}</div>`:'<div style="font-size:12px;color:#9ca3af;padding:6px 0;border:1px dashed #e5e7eb;border-radius:8px;text-align:center;margin-top:4px">Assign an account to see boards</div>'}${pin.board?`<div style="font-size:12px;color:#059669;margin-top:6px">✓ ${pin.board}</div>`:`<div style="font-size:12px;color:#d97706;margin-top:4px">⚠ No board selected</div>`}</div></div></div>`;
+    return`<div class="card"><div class="ch" style="font-size:12px;color:#6b7280;font-weight:400"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${u.url}</span><span style="font-size:11px;padding:2px 8px;border-radius:99px;margin-left:8px;flex-shrink:0;background:${has?'#d1fae5':'#f3f4f6'};color:${has?'#065f46':'#6b7280'}">${has?'✓ Done':'⏳ Pending'}</span></div><div class="cb"><div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start"><div class="img-slot" onclick="document.getElementById('fi${u.id}').click()">${pin.imageUrl?`<img src="${pin.imageUrl}" alt="">`:'<div>📷</div><div>Upload</div>'}</div><input type="file" id="fi${u.id}" accept="image/*" style="display:none" onchange="quickUpload(${u.id},this.files[0])"><div style="flex:1"><label>Title — <span style="color:${(pin.title||'').length>90?'#dc2626':'#9ca3af'}">${(pin.title||'').length}/100</span></label><textarea maxlength="100" rows="2" oninput="updPin(${u.id},{title:this.value})" style="min-height:52px">${pin.title||''}</textarea></div></div><div class="mb"><label>Description — <span style="color:${(pin.description||'').length>480?'#dc2626':(pin.description||'').length>0&&(pin.description||'').length<150?'#d97706':'#059669'}">${(pin.description||'').length}/500</span></label><textarea maxlength="500" rows="3" oninput="updPin(${u.id},{description:this.value})">${pin.description||''}</textarea></div><div class="mb"><label>Tags — max 5 (${tc}/5)</label><div class="tag-area" onclick="this.querySelector('input')?.focus()">${(pin.tags||[]).map(t=>`<span class="tag">${t}<span class="tx" onclick="rmTag(${u.id},'${t.replace(/'/g,"\\'")}')">×</span></span>`).join('')}${tc<5?`<input type="text" placeholder="type, Enter to add…" onkeydown="if((event.key==='Enter'||event.key===',')&&this.value.trim()){event.preventDefault();const v=this.value.trim().replace(/^#/,'');const pp=ga()?.pins.find(x=>x.urlId===${u.id});if(pp&&!pp.tags.includes(v)&&pp.tags.length<5){pp.tags.push(v);sv();renderPins();}this.value=''}">`:''}</div></div><div><label>Board</label>${boards.length?`<div style="display:flex;flex-wrap:wrap;gap:0;margin-top:4px">${boards.map(b=>`<span class="board-chip ${pin.board===b?'sel':''}" onclick="updPin(${u.id},{board:'${b.replace(/'/g,"\\'")}'});this.closest('.cb').querySelectorAll('.board-chip').forEach(el=>el.classList.remove('sel'));this.classList.add('sel')">${b}</span>`).join('')}</div>`:'<div style="font-size:12px;color:#9ca3af;padding:6px 0;border:1px dashed #e5e7eb;border-radius:8px;text-align:center;margin-top:4px">Assign an account to see boards</div>'}${pin.board?`<div style="font-size:12px;color:#059669;margin-top:6px">✓ ${pin.board}</div>`:`<div style="font-size:12px;color:#d97706;margin-top:4px">⚠ No board selected</div>`}</div></div></div>`;
   }).join('');
 }
 
 // ─── IMAGE BANK ───────────────────────────────────────────────
 function matchScore(fn,pin){const n=fn.toLowerCase().replace(/[-_.]/g,' ').replace(/\.(jpg|jpeg|png|webp|gif)$/i,'');const w=n.split(' ').filter(x=>x.length>2);const t=((pin.title||'')+' '+(pin.link||'')+' '+(pin.description||'')).toLowerCase();return w.reduce((s,x)=>s+(t.includes(x)?x.length:0),0);}
 function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').style.borderColor='#e5e7eb';handleBulkImgs(e.dataTransfer.files);}
-async function handleBulkImgs(files){
-  const p=ga();
-  for(const file of Array.from(files)){
-    const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
-    const entry={id:Date.now()+Math.random(),name:file.name,dataUrl,hostedUrl:'',assignedPinId:null};
-    ST.imgBank.push(entry);
-    if(p) autoAssignOne(entry,p);
-    sv();renderImgBank();upStats();
-    uploadFile(file).then(url=>{if(url){entry.hostedUrl=url;if(entry.assignedPinId&&p){const pin=p.pins.find(x=>x.urlId===entry.assignedPinId);if(pin)pin.imageUrl=url;}sv();renderImgBank();upStats();}});
-  }
-  toast(Array.from(files).length+' image(s) added'+(ST.s.storProv!=='none'?', uploading...':''));
-}
+async function handleBulkImgs(files){const p=ga();for(const file of Array.from(files)){const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});const entry={id:Date.now()+Math.random(),name:file.name,dataUrl,hostedUrl:'',assignedPinId:null};ST.imgBank.push(entry);if(p)autoAssignOne(entry,p);sv();renderImgBank();upStats();uploadFile(file).then(url=>{if(url){entry.hostedUrl=url;if(entry.assignedPinId&&p){const pin=p.pins.find(x=>x.urlId===entry.assignedPinId);if(pin)pin.imageUrl=url;}sv();renderImgBank();upStats();}});}toast(Array.from(files).length+' image(s) added'+(ST.s.storProv!=='none'?', uploading…':''));}
 function autoAssignOne(img,proj){if(!proj||!proj.pins.length)return;let best=null,bestScore=0;proj.pins.forEach(pin=>{const s=matchScore(img.name,pin);if(s>bestScore){bestScore=s;best=pin;}});if(!best||bestScore===0)best=proj.pins.find(pin=>!ST.imgBank.find(i=>i.assignedPinId===pin.urlId&&i.id!==img.id));if(best){img.assignedPinId=best.urlId;best.imageUrl=img.hostedUrl||img.dataUrl;}}
 function autoAssignAll(){const p=ga();if(!p){toast('Select a project first','err');return;}ST.imgBank.forEach(img=>{img.assignedPinId=null;});[...ST.imgBank].sort((a,b)=>a.name.localeCompare(b.name)).forEach(img=>autoAssignOne(img,p));ST.imgBank.forEach(img=>{if(img.assignedPinId){const pin=p.pins.find(x=>x.urlId===img.assignedPinId);if(pin)pin.imageUrl=img.hostedUrl||img.dataUrl;}});sv();renderImgBank();upStats();toast('Auto-assigned '+ST.imgBank.filter(i=>i.assignedPinId).length+' images');}
 function assignImgToPin(imgId,pinUrlId){const p=ga();const img=ST.imgBank.find(x=>x.id==imgId);if(!img||!p)return;img.assignedPinId=pinUrlId?parseFloat(pinUrlId):null;if(img.assignedPinId){const pin=p.pins.find(x=>x.urlId===img.assignedPinId);if(pin)pin.imageUrl=img.hostedUrl||img.dataUrl;}sv();renderImgBank();upStats();}
 function removeImg(imgId){ST.imgBank=ST.imgBank.filter(x=>x.id!=imgId);sv();renderImgBank();}
 function clearImgBank(){if(!confirm('Clear all images?'))return;ST.imgBank=[];sv();renderImgBank();}
-function renderImgBank(){
-  const bank=document.getElementById('img-bank'),empty=document.getElementById('img-empty'),count=document.getElementById('img-bank-count'),ms=document.getElementById('manual-section'),ml=document.getElementById('manual-list');
-  const p=ga();
-  count.textContent=ST.imgBank.length?`${ST.imgBank.length} image(s) — ${ST.imgBank.filter(i=>i.hostedUrl).length} in cloud`:'No images uploaded';
-  if(!ST.imgBank.length){bank.innerHTML='';empty.style.display='block';ms.style.display='none';return;}
-  empty.style.display='none';
-  bank.innerHTML=ST.imgBank.map(img=>{const pin=p?p.pins.find(x=>x.urlId===img.assignedPinId):null;const label=pin?(pin.title||pin.link||'').substring(0,18):'Unassigned';const bg=img.hostedUrl?'rgba(5,150,105,.85)':pin?'rgba(0,0,0,.65)':'rgba(156,163,175,.8)';return`<div class="img-thumb"><img src="${img.dataUrl}" alt="${img.name}"><div class="badge" style="background:${bg}">${img.hostedUrl?'☁ ':''}${label}</div><button class="rmb" onclick="removeImg(${img.id})">✕</button></div>`;}).join('');
-  if(p&&p.pins.length){ms.style.display='block';ml.innerHTML=ST.imgBank.map(img=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6"><img src="${img.dataUrl}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.name}</div><div style="font-size:11px;color:${img.hostedUrl?'#059669':'#9ca3af'}">${img.hostedUrl?'☁ '+img.hostedUrl.substring(0,50)+'...':'Local only'}</div></div><select style="width:auto;font-size:12px;padding:5px 8px;max-width:220px" onchange="assignImgToPin(${img.id},this.value)"><option value="">— assign to pin —</option>${p.pins.map(pin=>`<option value="${pin.urlId}" ${img.assignedPinId===pin.urlId?'selected':''}>${(pin.title||pin.link||'').substring(0,42)}</option>`).join('')}</select></div>`).join('');}
-  else ms.style.display='none';
-}
+function renderImgBank(){const bank=document.getElementById('img-bank'),empty=document.getElementById('img-empty'),count=document.getElementById('img-bank-count'),ms=document.getElementById('manual-section'),ml=document.getElementById('manual-list');const p=ga();count.textContent=ST.imgBank.length?`${ST.imgBank.length} image(s) — ${ST.imgBank.filter(i=>i.hostedUrl).length} in cloud`:'No images';if(!ST.imgBank.length){bank.innerHTML='';empty.style.display='block';ms.style.display='none';return;}empty.style.display='none';bank.innerHTML=ST.imgBank.map(img=>{const pin=p?p.pins.find(x=>x.urlId===img.assignedPinId):null;const label=pin?(pin.title||pin.link||'').substring(0,18):'Unassigned';const bg=img.hostedUrl?'rgba(5,150,105,.85)':pin?'rgba(0,0,0,.65)':'rgba(156,163,175,.8)';return`<div class="img-thumb"><img src="${img.dataUrl}" alt="${img.name}"><div class="badge" style="background:${bg}">${img.hostedUrl?'☁ ':''}${label}</div><button class="rmb" onclick="removeImg(${img.id})">✕</button></div>`;}).join('');if(p&&p.pins.length){ms.style.display='block';ml.innerHTML=ST.imgBank.map(img=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6"><img src="${img.dataUrl}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.name}</div><div style="font-size:11px;color:${img.hostedUrl?'#059669':'#9ca3af'}">${img.hostedUrl?'☁ '+img.hostedUrl.substring(0,50)+'…':'Local only'}</div></div><select style="width:auto;font-size:12px;padding:5px 8px;max-width:220px" onchange="assignImgToPin(${img.id},this.value)"><option value="">— assign to pin —</option>${p.pins.map(pin=>`<option value="${pin.urlId}" ${img.assignedPinId===pin.urlId?'selected':''}>${(pin.title||pin.link||'').substring(0,42)}</option>`).join('')}</select></div>`).join('');}else ms.style.display='none';}
 
 // ─── SCHEDULE ─────────────────────────────────────────────────
 function addSlot(){const d=document.createElement('div');d.className='tsr';d.innerHTML='<input type="time" value="09:00"><span style="color:#9ca3af;font-size:12px;flex-shrink:0">to</span><input type="time" value="12:00"><button class="btn sm danger" onclick="this.closest(\'.tsr\').remove()">✕</button>';document.getElementById('tslots').appendChild(d);}
-function updateSchedUI(){const sel=document.getElementById('sc-acc');sel.innerHTML='<option value="">— select account —</option>';ST.accounts.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' ('+a.boards.length+' boards)';sel.appendChild(o);});const p=ga();if(p&&p.accountId)sel.value=p.accountId;}
-function genSched(){
-  const p=ga();if(!p){toast('Select a project first','err');return;}
-  const pins=p.pins.filter(x=>x.title);if(!pins.length){toast('Generate pins first','err');return;}
-  const sd=document.getElementById('sc-date').value;if(!sd){toast('Set a start date','err');return;}
-  const ppd=parseInt(document.getElementById('sc-ppd').value),intv=parseInt(document.getElementById('sc-int').value);
-  const slots=Array.from(document.querySelectorAll('.tsr')).map(r=>{const ins=r.querySelectorAll('input[type=time]');return{from:ins[0].value,to:ins[1].value};});
-  if(!slots.length){toast('Add at least one time window','err');return;}
-  const rows=[];let pi=0,day=0;
-  while(pi<pins.length&&day<365){
-    const date=new Date(sd+'T00:00:00');date.setDate(date.getDate()+day);
-    const yyyy=date.getFullYear(),mm=String(date.getMonth()+1).padStart(2,'0'),dd=String(date.getDate()).padStart(2,'0');
-    const dateStr=date.toLocaleDateString('en-US',{month:'short',day:'numeric',weekday:'short'});
-    for(let i=0;i<ppd&&pi<pins.length;i++){
-      const sl=slots[i%slots.length];const[h,m]=sl.from.split(':').map(Number);
-      const tot=h*60+m+Math.floor((i/slots.length)*intv);
-      const fh=String(Math.floor(tot/60)%24).padStart(2,'0'),fm=String(tot%60).padStart(2,'0');
-      rows.push({date:dateStr,time:`${fh}:${fm}`,publishDate:`${yyyy}-${mm}-${dd} ${fh}:${fm}:00`,title:pins[pi].title,pinUrlId:pins[pi].urlId});
-      pi++;
-    }
-    day++;
-  }
-  p.scheduleRows=rows;sv();
-  document.getElementById('sched-prev').innerHTML=`<div style="font-size:13px;font-weight:500;margin-bottom:10px">${rows.length} pins across ${day} days</div><div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden"><div class="csv-wrap"><table><thead><tr><th>#</th><th>Date</th><th>Time</th><th>Board</th><th>Title</th></tr></thead><tbody>${rows.map((r,i)=>{const pin=p.pins.find(x=>x.urlId===r.pinUrlId);return`<tr><td style="color:#9ca3af">${i+1}</td><td>${r.date}</td><td style="color:#E60023;font-weight:500">${r.time}</td><td style="color:#059669">${pin?.board||'—'}</td><td>${r.title}</td></tr>`;}).join('')}</tbody></table></div></div>`;
-  toast(rows.length+' pins scheduled');
-}
+function updateSchedUI(){const sel=document.getElementById('sc-acc');sel.innerHTML='<option value="">— select —</option>';ST.accounts.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' ('+a.boards.length+' boards)';sel.appendChild(o);});const p=ga();if(p&&p.accountId)sel.value=p.accountId;}
+function genSched(){const p=ga();if(!p){toast('Select a project','err');return;}const pins=p.pins.filter(x=>x.title);if(!pins.length){toast('Generate pins first','err');return;}const sd=document.getElementById('sc-date').value;if(!sd){toast('Set a start date','err');return;}const ppd=parseInt(document.getElementById('sc-ppd').value),intv=parseInt(document.getElementById('sc-int').value);const slots=Array.from(document.querySelectorAll('.tsr')).map(r=>{const ins=r.querySelectorAll('input[type=time]');return{from:ins[0].value,to:ins[1].value};});if(!slots.length){toast('Add at least one window','err');return;}const rows=[];let pi=0,day=0;while(pi<pins.length&&day<365){const date=new Date(sd+'T00:00:00');date.setDate(date.getDate()+day);const yyyy=date.getFullYear(),mm=String(date.getMonth()+1).padStart(2,'0'),dd=String(date.getDate()).padStart(2,'0');const dateStr=date.toLocaleDateString('en-US',{month:'short',day:'numeric',weekday:'short'});for(let i=0;i<ppd&&pi<pins.length;i++){const sl=slots[i%slots.length];const[h,m]=sl.from.split(':').map(Number);const tot=h*60+m+Math.floor((i/slots.length)*intv);const fh=String(Math.floor(tot/60)%24).padStart(2,'0'),fm=String(tot%60).padStart(2,'0');rows.push({date:dateStr,time:`${fh}:${fm}`,publishDate:`${yyyy}-${mm}-${dd} ${fh}:${fm}:00`,title:pins[pi].title,pinUrlId:pins[pi].urlId});pi++;}day++;}p.scheduleRows=rows;sv();document.getElementById('sched-prev').innerHTML=`<div style="font-size:13px;font-weight:500;margin-bottom:10px">${rows.length} pins across ${day} days</div><div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden"><div style="overflow:auto;max-height:400px"><table><thead><tr><th>#</th><th>Date</th><th>Time</th><th>Board</th><th>Title</th></tr></thead><tbody>${rows.map((r,i)=>{const pin=p.pins.find(x=>x.urlId===r.pinUrlId);return`<tr><td style="color:#9ca3af">${i+1}</td><td>${r.date}</td><td style="color:#E60023;font-weight:500">${r.time}</td><td style="color:#059669">${pin?.board||'—'}</td><td>${r.title}</td></tr>`;}).join('')}</tbody></table></div></div>`;toast(rows.length+' pins scheduled');}
 
 // ─── EXPORT ───────────────────────────────────────────────────
-function buildExport(){
-  const p=ga(),empty=document.getElementById('exp-empty'),c=document.getElementById('exp-cont');
-  const pins=p?p.pins.filter(x=>x.title):[];
-  if(!pins.length){c.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  const rows=pins.map((pin,idx)=>{const sched=p.scheduleRows?.[idx];return{'Title':pin.title||'','Description':pin.description||'','Link':pin.link||'','Image URL (link)':pin.imageUrl||'','Board':pin.board||'','Keywords':(pin.tags||[]).slice(0,5).join(' '),'Publish date':sched?sched.publishDate:'',' Note':''};});
-  const warns=[];
-  if(rows.filter(r=>!r['Board']).length) warns.push('⚠ '+rows.filter(r=>!r['Board']).length+' pins missing board');
-  if(rows.filter(r=>!r['Image URL (link)']).length) warns.push('⚠ '+rows.filter(r=>!r['Image URL (link)']).length+' pins missing image URL');
-  c.innerHTML=`${warns.length?`<div class="alert aw mb">${warns.join('<br>')}</div>`:''}<div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden"><div class="csv-wrap"><table><thead><tr><th style="width:28px">#</th>${CSV_HDRS.map(h=>`<th>${h}</th>`).join('')}<th style="width:28px"></th></tr></thead><tbody id="csv-tbody">${rows.map((r,i)=>`<tr><td style="color:#9ca3af;text-align:center">${i+1}</td>${CSV_HDRS.map(h=>`<td contenteditable="true">${(r[h]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>`).join('')}<td><button onclick="this.closest('tr').remove()" style="border:none;background:transparent;color:#f87171;cursor:pointer;font-size:14px;padding:0 6px">✕</button></td></tr>`).join('')}</tbody></table></div><div style="padding:10px 14px;background:#f9fafb;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#6b7280">${rows.length} pins · Keywords space-separated, no # · Board must match Pinterest exactly</span><button class="btn pr sm" onclick="dlCSV()">⬇ Download</button></div></div>`;
-}
-function dlCSV(){
-  const tbody=document.getElementById('csv-tbody');if(!tbody){toast('Click Refresh first','err');return;}
-  const rows=[CSV_HDRS.join(',')];
-  tbody.querySelectorAll('tr').forEach(tr=>{const cells=Array.from(tr.querySelectorAll('td[contenteditable]'));if(!cells.length)return;const vals=cells.map(td=>{let text=(td.innerText||td.textContent||'').replace(/\r?\n|\r/g,' ').replace(/\s+/g,' ').trim();return'"'+text.replace(/"/g,'""')+'"';});rows.push(vals.join(','));});
-  const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pinterest-pins-'+new Date().toISOString().split('T')[0]+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
-  toast('CSV downloaded — '+(rows.length-1)+' pins');
-  const p=ga();if(p){p.status='exported';sv();}
-}
-function dlSampleCSV(){const sample=['Title,Description,Link,Image URL (link),Board,Keywords,Publish date,Note','"10 Summer Fashion Ideas You Need","Get ahead of the trends. #SummerFashion #Outfit2025","https://yoursite.com/summer-fashion","https://mypins.b-cdn.net/pinforge/summer.jpg","Summer Fashion","summer fashion outfit ideas 2025","2025-08-15 08:00:00",""'].join('\n');const blob=new Blob([sample],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pinterest-sample-format.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);toast('Sample CSV downloaded');}
+function buildExport(){const p=ga(),empty=document.getElementById('exp-empty'),c=document.getElementById('exp-cont');const pins=p?p.pins.filter(x=>x.title):[];if(!pins.length){c.innerHTML='';empty.style.display='block';return;}empty.style.display='none';const rows=pins.map((pin,idx)=>{const sched=p.scheduleRows?.[idx];return{'Title':pin.title||'','Description':pin.description||'','Link':pin.link||'','Image URL (link)':pin.imageUrl||'','Board':pin.board||'','Keywords':(pin.tags||[]).slice(0,5).join(' '),'Publish date':sched?sched.publishDate:'',' Note':''};});const warns=[];if(rows.filter(r=>!r['Board']).length)warns.push('⚠ '+rows.filter(r=>!r['Board']).length+' pins missing board');if(rows.filter(r=>!r['Image URL (link)']).length)warns.push('⚠ '+rows.filter(r=>!r['Image URL (link)']).length+' pins missing image URL');c.innerHTML=`${warns.length?`<div class="alert aw mb">${warns.join('<br>')}</div>`:''}<div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden"><div style="overflow:auto;max-height:500px"><table><thead><tr><th style="width:28px">#</th>${CSV_HDRS.map(h=>`<th>${h}</th>`).join('')}<th style="width:28px"></th></tr></thead><tbody id="csv-tbody">${rows.map((r,i)=>`<tr><td style="color:#9ca3af;text-align:center">${i+1}</td>${CSV_HDRS.map(h=>`<td contenteditable="true">${(r[h]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>`).join('')}<td><button onclick="this.closest('tr').remove()" style="border:none;background:transparent;color:#f87171;cursor:pointer;font-size:14px;padding:0 6px">✕</button></td></tr>`).join('')}</tbody></table></div><div style="padding:10px 14px;background:#f9fafb;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#6b7280">${rows.length} pins</span><button class="btn pr sm" onclick="dlCSV()">⬇ Download</button></div></div>`;}
+function dlCSV(){const tbody=document.getElementById('csv-tbody');if(!tbody){toast('Click Refresh first','err');return;}const rows=[CSV_HDRS.join(',')];tbody.querySelectorAll('tr').forEach(tr=>{const cells=Array.from(tr.querySelectorAll('td[contenteditable]'));if(!cells.length)return;const vals=cells.map(td=>{let text=(td.innerText||td.textContent||'').replace(/\r?\n|\r/g,' ').replace(/\s+/g,' ').trim();return'"'+text.replace(/"/g,'""')+'"';});rows.push(vals.join(','));});const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pinterest-pins-'+new Date().toISOString().split('T')[0]+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);toast('CSV downloaded — '+(rows.length-1)+' pins');const p=ga();if(p){p.status='exported';sv();}}
+function dlSampleCSV(){const s=['Title,Description,Link,Image URL (link),Board,Keywords,Publish date,Note','"10 Summer Fashion Ideas","Top trends this season. #SummerFashion","https://site.com/summer","https://cdn.b-cdn.net/pinforge/img.jpg","Summer Fashion","summer fashion outfit ideas 2025","2025-08-15 08:00:00",""'].join('\n');const blob=new Blob([s],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pinterest-sample.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
 
 // ─── INIT ─────────────────────────────────────────────────────
 function restoreUI(){
   document.getElementById('master-prompt').value=ST.s.masterPrompt||DEFAULT_PROMPT;
-  if(ST.s.bunnyZone) document.getElementById('bunny-zone').value=ST.s.bunnyZone;
-  if(ST.s.bunnyKey) document.getElementById('bunny-key').value=ST.s.bunnyKey;
-  if(ST.s.bunnyRegion) document.getElementById('bunny-region').value=ST.s.bunnyRegion;
-  if(ST.s.bunnyCdn) document.getElementById('bunny-cdn').value=ST.s.bunnyCdn;
-  if(ST.s.bunnyFolder) document.getElementById('bunny-folder').value=ST.s.bunnyFolder;
-  if(ST.s.cldCloud) document.getElementById('cld-cloud').value=ST.s.cldCloud;
-  if(ST.s.cldPreset) document.getElementById('cld-preset').value=ST.s.cldPreset;
-  if(ST.s.imgbbKey) document.getElementById('ibb-key').value=ST.s.imgbbKey;
+  if(ST.s.bunnyZone)document.getElementById('bunny-zone').value=ST.s.bunnyZone;
+  if(ST.s.bunnyKey)document.getElementById('bunny-key').value=ST.s.bunnyKey;
+  if(ST.s.bunnyRegion)document.getElementById('bunny-region').value=ST.s.bunnyRegion;
+  if(ST.s.bunnyCdn)document.getElementById('bunny-cdn').value=ST.s.bunnyCdn;
+  if(ST.s.bunnyFolder)document.getElementById('bunny-folder').value=ST.s.bunnyFolder;
+  if(ST.s.cldCloud)document.getElementById('cld-cloud').value=ST.s.cldCloud;
+  if(ST.s.cldPreset)document.getElementById('cld-preset').value=ST.s.cldPreset;
+  if(ST.s.imgbbKey)document.getElementById('ibb-key').value=ST.s.imgbbKey;
   selStor(ST.s.storProv||'none');
   const prov=ST.s.defProvider||'claude';
   const btn=document.getElementById('dp-'+prov);
   if(btn){document.querySelectorAll('#def-prov-btns .prov-pill').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');}
   document.getElementById('sc-date').value=new Date().toISOString().split('T')[0];
 }
-function init(){ld();restoreUI();upStats();renderProjs();renderAccounts();updateSchedUI();}
+
+function init(){
+  ld();restoreUI();upStats();renderProjs();renderAccounts();updateSchedUI();
+  checkExtension();
+  setInterval(checkExtension,15000);
+}
 init();
 </script>
 </body>
