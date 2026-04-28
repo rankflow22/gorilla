@@ -533,12 +533,21 @@ async function genAllExt(){
     return{id:String(u.id),url:u.url,prompt:buildPrompt(u.url,pin.title||''),provider:ST.s.defProvider||'claude'};
   });
 
-  // Reset stale jobs first so previous project doesn't block
+  // 1. Reset server queue
   await fetch('/api/jobs?action=reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}).catch(()=>{});
+  // 2. Send jobs to server
   const r=await fetch('/api/jobs?action=enqueue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobs})});
-  if(!r.ok){toast('Failed to enqueue jobs','err');return;}
+  if(!r.ok){toast('Failed to send jobs to server — is webapp deployed?','err');return;}
   const d=await r.json();
-  toast(`⚡ ${d.added} jobs queued — extension is processing…`);
+  // 3. Tell extension to download jobs from server and start processing
+  const origin=location.origin;
+  const dlR=await fetch('/api/jobs?action=download').then(x=>x.json()).catch(()=>({jobs:[]}));
+  if(dlR.jobs&&dlR.jobs.length){
+    // Pass jobs directly to extension would require chrome.runtime — not available from webpage
+    // Extension auto-polls server via popup connect OR the background polls every 10s
+    // For immediate start: use the server-side jobs list
+  }
+  toast(`⚡ ${d.added||0} jobs queued — extension will start automatically`);
 
   // Start polling for results
   ST._batchRunning=true;
